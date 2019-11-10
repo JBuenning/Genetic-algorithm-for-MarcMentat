@@ -4,8 +4,24 @@ import matplotlib.pyplot as plt
 class Shape(geometry.Polygon):
     def __init__(self, shell, holes=None, fixed_x=None, fixed_y=None):
         super().__init__(shell, holes)
-        self.fixed_x = fixed_x
-        self.fixed_y = fixed_y #Liste mit Positionen von Punkten, die nicht in x oder y richtung bewegt werden dürfen
+        
+        if fixed_x is None:
+            self.fixed_x = [False]*(len(shell)+1)#möglicher Konflikt, wenn erster Punkt doppelt genannt wird!!!
+        else:
+            self.fixed_x = fixed_x
+
+        if fixed_y is None:
+            self.fixed_y = [False]*(len(shell)+1)
+        else:
+            self.fixed_y = fixed_y
+
+        print(len(shell))
+        print(len(self.fixed_y))
+
+            
+        #Liste mit True oder False der Länge der Punkteliste
+        #innere Punkte dürfen immer bewegt werden (vorerst)
+        # Liste soll so aussehen: [True, False, False,...]
         
 
         #einige Methoden und Attribute, die schon da sind:
@@ -25,6 +41,7 @@ def display_shape(shape):
         x, y = shape.xy
         plt.fill(x,y, color = 'w')
     plt.show()
+if __name__=='__main__':
+    s = Shape([(0, 0), (2,8), (10, 10), (10, 0)],[[(1,1), (1,2), (2,1)]])
+    display_shape(s)
 
-s = Shape([(0, 0), (2,8), (10, 10), (10, 0)],[[(1,1), (1,2), (2,1)]])
-display_shape(s)
