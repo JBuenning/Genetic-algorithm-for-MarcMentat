@@ -1,14 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
-##import shapely
-##from shapely.geometry import Polygon
+import matplotlib
 from shape import Shape
 
 class GUI(tk.Tk):
 
     def __init__(self):
-        tk.Tk.__init__(self)
+        super().__init__()
         self.minsize(width=500, height=300)
         self.title("Genetic MarcMentat")
 
@@ -58,15 +57,26 @@ class GUI(tk.Tk):
 class Startpage(tk.Frame):
 
     def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
+        super().__init__(parent)
 
-        label = tk.Label(self, text="Startpage")
+        topbox = tk.Canvas(self, bg='blue')
+        label = tk.Label(topbox, text="platz für das polygon")
         label.pack()
+        topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        topbox.grid_rowconfigure(0, weight=1)
+        topbox.grid_columnconfigure(0, weight=1)
+
+        rightbox = tk.Frame(self, bg='red')
+        right_label = tk.Label(rightbox, text='blatz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
+        right_label.pack()
+        rightbox.pack(side=tk.RIGHT, fill=tk.Y)
+
+
 
 class MarcMentatPage(tk.Frame):
 
     def __init__(self, parent):
-        tk.Frame.__init__(self, parent)
+        super().__init__(parent)
 
         topbox = tk.Frame(self, bg='red')
         label = tk.Label(topbox, text="hier kann man später die Marcs verbinden")
