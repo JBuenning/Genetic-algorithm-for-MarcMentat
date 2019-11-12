@@ -63,12 +63,15 @@ class Startpage(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        
         self.topbox = tk.Canvas(self, bg='blue')
-        label = tk.Label(self.topbox, text="platz für das polygon")
-        label.pack()
+##        label = tk.Label(self.topbox, text="platz für das polygon")
+##        label.pack()
         self.topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-##        self.topbox.grid_rowconfigure(0, weight=1)
-##        self.topbox.grid_columnconfigure(0, weight=1)
+        self.topbox.grid_rowconfigure(0, weight=1)
+        self.topbox.grid_columnconfigure(0, weight=1) #nur nötig, wenn Label o.Ä. da ist
 
         rightbox = tk.Frame(self, bg='red')
         right_label = tk.Label(rightbox, text='Platz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
@@ -105,7 +108,7 @@ class MarcMentatPage(tk.Frame):
 
 
 def create_example_polygon():
-    return Shape([(0,0),(2,2),(2,1),(1,0)])
+    return Shape([(0,0),(200,200),(200,100),(100,0)])
 
 
 ##example = create_example_polygon()
@@ -117,6 +120,6 @@ def create_example_polygon():
 ##plt.show()
 
 gui = GUI()
-example = create_example_polygon() #funktioniert alles noch nicht. Kümmer ich mich morgen drum
+example = create_example_polygon()
 gui.draw_shape(example)
 gui.update()
