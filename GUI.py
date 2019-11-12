@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import *
 import matplotlib.pyplot as plt
 import matplotlib
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from shape import Shape
 
 class GUI(tk.Tk):
@@ -55,39 +56,58 @@ class GUI(tk.Tk):
     def save_as(self):
         print("save as")
 
-    def draw_shape(self, shape):
-        self.pages["startpage"].draw_shape(shape)
+    def draw_shape(self, shape, autoscale=True):
+        self.pages["startpage"].draw_shape(shape, autoscale)
 
 class Startpage(tk.Frame):
 
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
+        topbox = tk.Frame(self)
+        topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+##        self.grid_columnconfigure(0, weight=1)
+##        self.grid_rowconfigure(0, weight=1)
         
-        self.topbox = tk.Canvas(self, bg='blue')
+        #self.topbox = tk.Canvas(self, bg='blue')
+        
 ##        label = tk.Label(self.topbox, text="platz für das polygon")
 ##        label.pack()
-        self.topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.topbox.grid_rowconfigure(0, weight=1)
-        self.topbox.grid_columnconfigure(0, weight=1) #nur nötig, wenn Label o.Ä. da ist
+        
+        #self.topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+##        self.topbox.grid_rowconfigure(0, weight=1)
+##        self.topbox.grid_columnconfigure(0, weight=1)
+##
+        f = matplotlib.figure.Figure()
+        self.plot = f.add_subplot(111)
+        canvas = FigureCanvasTkAgg(f, topbox)
+        canvas.draw()
+        toolbar = NavigationToolbar2Tk(canvas, topbox)
+        toolbar.update()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         rightbox = tk.Frame(self, bg='red')
         right_label = tk.Label(rightbox, text='Platz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
         right_label.pack()
         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
 
-    def draw_shape(self, shape):
-        points = list(shape.exterior.coords)
-        coords = []
+    def draw_shape(self, shape, autoscale):
+##        points = list(shape.exterior.coords)
+##        coords = []
+##        
+##        for sublist in points:
+##            for coord in sublist:
+##                coords.append(coord)
+##                
+##        self.topbox.delete("all")
+##        self.topbox.create_polygon(coords)
         
-        for sublist in points:
-            for coord in sublist:
-                coords.append(coord)
-                
-        self.topbox.delete("all")
-        self.topbox.create_polygon(coords)
+        self.plot.clear()
+        self.plot.autoscale(autoscale)
+        self.plot.plot(*shape.exterior.xy, marker = 'o', color='black')
+            
 
 class MarcMentatPage(tk.Frame):
 
@@ -121,5 +141,5 @@ def create_example_polygon():
 
 gui = GUI()
 example = create_example_polygon()
-gui.draw_shape(example)
-gui.update()
+gui.draw_shape(example, autoscale=True)
+gui.mainloop()
