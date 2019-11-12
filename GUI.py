@@ -106,7 +106,13 @@ class Startpage(tk.Frame):
         
         self.plot.clear()
         self.plot.autoscale(autoscale)
+        self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
         self.plot.plot(*shape.exterior.xy, marker = 'o', color='black')
+
+        interiors = shape.interiors
+        for interior in interiors:
+            self.plot.fill(*interior.xy, color='white')
+            self.plot.plot(*interior.xy, marker = 'o', color='black')
             
 
 class MarcMentatPage(tk.Frame):
@@ -128,14 +134,11 @@ class MarcMentatPage(tk.Frame):
 
 
 def create_example_polygon():
-    return Shape([(0,0),(200,200),(200,100),(100,0)])
+    return Shape([(0,0),(200,200),(200,100),(100,0)],holes=[[(100,50), (150,100), (125,50)]])
 
 
 ##example = create_example_polygon()
 ##show_shape()
-##
-##
-##
 ##plt.plot(*example.exterior.xy, marker = 'o')
 ##plt.show()
 
