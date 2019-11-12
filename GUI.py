@@ -1,16 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import *
-import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from shape import Shape
+import time
 
 class GUI(tk.Tk):
 
     def __init__(self):
         super().__init__()
-        self.minsize(width=500, height=300)
+        #self.minsize(width=500, height=300)
         self.title("Genetic MarcMentat")
 
         #Backroundframe, der allen Platz des Fensters einnimmt und auf den alles gezeichnet wird
@@ -45,7 +44,12 @@ class GUI(tk.Tk):
 
         self.show_frame("startpage")
 
+    def draw_shape(self, shape, autoscale=True):
+        #zeichnet das Polygon
+        self.pages["startpage"].draw_shape(shape, autoscale)
+
     def show_frame(self, name):
+        #wechselt zwischen den Frames, die den ganzen Platz im Fenster einnehmen
         self.pages[name].tkraise()
 
     def open_file(self):
@@ -56,8 +60,6 @@ class GUI(tk.Tk):
     def save_as(self):
         print("save as")
 
-    def draw_shape(self, shape, autoscale=True):
-        self.pages["startpage"].draw_shape(shape, autoscale)
 
 class Startpage(tk.Frame):
 
@@ -67,19 +69,6 @@ class Startpage(tk.Frame):
         topbox = tk.Frame(self)
         topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-##        self.grid_columnconfigure(0, weight=1)
-##        self.grid_rowconfigure(0, weight=1)
-        
-        #self.topbox = tk.Canvas(self, bg='blue')
-        
-##        label = tk.Label(self.topbox, text="platz für das polygon")
-##        label.pack()
-        
-        #self.topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        
-##        self.topbox.grid_rowconfigure(0, weight=1)
-##        self.topbox.grid_columnconfigure(0, weight=1)
-##
         f = matplotlib.figure.Figure()
         self.plot = f.add_subplot(111)
         canvas = FigureCanvasTkAgg(f, topbox)
@@ -94,15 +83,6 @@ class Startpage(tk.Frame):
         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
 
     def draw_shape(self, shape, autoscale):
-##        points = list(shape.exterior.coords)
-##        coords = []
-##        
-##        for sublist in points:
-##            for coord in sublist:
-##                coords.append(coord)
-##                
-##        self.topbox.delete("all")
-##        self.topbox.create_polygon(coords)
         
         self.plot.clear()
         self.plot.autoscale(autoscale)
@@ -136,13 +116,16 @@ class MarcMentatPage(tk.Frame):
 def create_example_polygon():
     return Shape([(0,0),(200,200),(200,100),(100,0)],holes=[[(100,50), (150,100), (125,50)]])
 
+def second_example_polygon():
+    return Shape([(0,0), (20,80), (100,100), (100,0)],[[(10,10), (10,20), (20,10)]])
 
-##example = create_example_polygon()
-##show_shape()
-##plt.plot(*example.exterior.xy, marker = 'o')
-##plt.show()
+
 
 gui = GUI()
 example = create_example_polygon()
 gui.draw_shape(example, autoscale=True)
-gui.mainloop()
+##gui.update()
+##time.sleep(4)
+##second_example = second_example_polygon()
+##gui.draw_shape(second_example, autoscale=True)
+##gui.update()
