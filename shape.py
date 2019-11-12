@@ -15,13 +15,11 @@ class Shape(geometry.Polygon):
         else:
             self.fixed_y = fixed_y
 
-        print(len(shell))
-        print(len(self.fixed_y))
 
-            
-        #Liste mit True oder False der Länge der Punkteliste
+        #fixed_x oder y: Liste mit True oder False der Länge der Punkteliste
         #innere Punkte dürfen immer bewegt werden (vorerst)
         # Liste soll so aussehen: [True, False, False,...]
+        #Das würde bedeuten erster punkt ist fixiert, zweiter und dritter nicht...
         
 
         #einige Methoden und Attribute, die schon da sind:

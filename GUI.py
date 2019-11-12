@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import *
 import matplotlib.pyplot as plt
 import matplotlib
 from shape import Shape
@@ -54,24 +55,36 @@ class GUI(tk.Tk):
     def save_as(self):
         print("save as")
 
+    def draw_shape(self, shape):
+        self.pages["startpage"].draw_shape(shape)
+
 class Startpage(tk.Frame):
 
     def __init__(self, parent):
         super().__init__(parent)
 
-        topbox = tk.Canvas(self, bg='blue')
-        label = tk.Label(topbox, text="platz für das polygon")
+        self.topbox = tk.Canvas(self, bg='blue')
+        label = tk.Label(self.topbox, text="platz für das polygon")
         label.pack()
-        topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        topbox.grid_rowconfigure(0, weight=1)
-        topbox.grid_columnconfigure(0, weight=1)
+        self.topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+##        self.topbox.grid_rowconfigure(0, weight=1)
+##        self.topbox.grid_columnconfigure(0, weight=1)
 
         rightbox = tk.Frame(self, bg='red')
-        right_label = tk.Label(rightbox, text='blatz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
+        right_label = tk.Label(rightbox, text='Platz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
         right_label.pack()
         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
 
-
+    def draw_shape(self, shape):
+        points = list(shape.exterior.coords)
+        coords = []
+        
+        for sublist in points:
+            for coord in sublist:
+                coords.append(coord)
+                
+        self.topbox.delete("all")
+        self.topbox.create_polygon(coords)
 
 class MarcMentatPage(tk.Frame):
 
@@ -91,12 +104,9 @@ class MarcMentatPage(tk.Frame):
         bottombox.pack(side=tk.BOTTOM, fill=tk.X)
 
 
-
-def show_shape(shape):
-    pass
-
 def create_example_polygon():
-    return Shape([(0,0),(2,2),(2,1),(1,0)],[[(1,1), (1,2), (2,1)]])
+    return Shape([(0,0),(2,2),(2,1),(1,0)])
+
 
 ##example = create_example_polygon()
 ##show_shape()
@@ -107,4 +117,6 @@ def create_example_polygon():
 ##plt.show()
 
 gui = GUI()
-gui.mainloop()
+example = create_example_polygon() #funktioniert alles noch nicht. Kümmer ich mich morgen drum
+gui.draw_shape(example)
+gui.update()
