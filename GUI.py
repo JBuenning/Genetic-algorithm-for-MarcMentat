@@ -71,11 +71,11 @@ class Startpage(tk.Frame):
 
         f = matplotlib.figure.Figure()
         self.plot = f.add_subplot(111)
-        canvas = FigureCanvasTkAgg(f, topbox)
-        canvas.draw()
-        toolbar = NavigationToolbar2Tk(canvas, topbox)
+        self.canvas = FigureCanvasTkAgg(f, topbox)
+        self.canvas.draw()
+        toolbar = NavigationToolbar2Tk(self.canvas, topbox)
         toolbar.update()
-        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         rightbox = tk.Frame(self, bg='red')
         right_label = tk.Label(rightbox, text='Platz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
@@ -93,6 +93,8 @@ class Startpage(tk.Frame):
         for interior in interiors:
             self.plot.fill(*interior.xy, color='white')
             self.plot.plot(*interior.xy, marker = 'o', color='black')
+
+        self.canvas.draw()
             
 
 class MarcMentatPage(tk.Frame):
@@ -123,9 +125,10 @@ def second_example_polygon():
 
 gui = GUI()
 example = create_example_polygon()
+gui.update()
 gui.draw_shape(example, autoscale=True)
-##gui.update()
-##time.sleep(4)
-##second_example = second_example_polygon()
-##gui.draw_shape(second_example, autoscale=True)
-##gui.update()
+gui.update()
+time.sleep(3)
+second_example = second_example_polygon()
+gui.draw_shape(second_example, autoscale=True)
+gui.update()
