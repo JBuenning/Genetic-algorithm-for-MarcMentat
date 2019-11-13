@@ -44,9 +44,9 @@ class GUI(tk.Tk):
 
         self.show_frame("startpage")
 
-    def draw_shape(self, shape, autoscale=True):
+    def draw_shape(self, shape, comparison_shape=None, autoscale=True):
         #zeichnet das Polygon
-        self.pages["startpage"].draw_shape(shape, autoscale)
+        self.pages["startpage"].draw_shape(shape, comparison_shape, autoscale)
 
     def show_frame(self, name):
         #wechselt zwischen den Frames, die den ganzen Platz im Fenster einnehmen
@@ -82,10 +82,18 @@ class Startpage(tk.Frame):
         right_label.pack()
         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
 
-    def draw_shape(self, shape, autoscale):
+    def draw_shape(self, shape, comparison_shape, autoscale):
         
         self.plot.clear()
         self.plot.autoscale(autoscale)
+        
+        if comparison_shape is not None:
+            self.plot.plot(*comparison_shape.exterior.xy, color='red')
+
+            interiors = comparison_shape.interiors
+            for interior in interiors:
+                self.plot.plot(*interior.xy, color='red')
+        
         self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
         self.plot.plot(*shape.exterior.xy, marker = 'o', color='black')
 
@@ -125,10 +133,35 @@ def second_example_polygon():
 
 gui = GUI()
 example = create_example_polygon()
-gui.update()
-gui.draw_shape(example, autoscale=True)
-gui.update()
-time.sleep(3)
 second_example = second_example_polygon()
-gui.draw_shape(second_example, autoscale=True)
 gui.update()
+gui.draw_shape(example, comparison_shape=example, autoscale=True)
+gui.update()
+time.sleep(2)
+gui.draw_shape(second_example, comparison_shape=example, autoscale=True)
+gui.update()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
