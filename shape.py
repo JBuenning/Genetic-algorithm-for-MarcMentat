@@ -2,18 +2,34 @@ from shapely import geometry
 import matplotlib.pyplot as plt
 
 class Shape(geometry.Polygon):
-    def __init__(self, shell, holes=None, fixed_x=None, fixed_y=None):
+    def __init__(self, shell, holes=None, move_restrictions=None, fixed_displacements=None, forces=None):
         super().__init__(shell, holes)
-        
-        if fixed_x is None:
-            self.fixed_x = [False]*(len(shell)+1)#möglicher Konflikt, wenn erster Punkt doppelt genannt wird!!!
-        else:
-            self.fixed_x = fixed_x
 
-        if fixed_y is None:
-            self.fixed_y = [False]*(len(shell)+1)
+        if move_restrictions is None:
+            self.move_restrictions = [False]*len(shell)
         else:
-            self.fixed_y = fixed_y
+            self.move_restrictions=move_restrictions
+
+        if fixed_displacements is None:
+            self.fixed_displacements = [(False),(False)]*len(shell)
+        else:
+            self.fixed_displacements=fixed_displacements
+
+        if forces is None:
+            self.forces = [(False),(False)]*len(shell)
+        else:
+            self.forces=forces
+            
+        
+##        if fixed_x is None:
+##            self.fixed_x = [False]*(len(shell)+1)#möglicher Konflikt, wenn erster Punkt doppelt genannt wird!!!
+##        else:
+##            self.fixed_x = fixed_x
+##
+##        if fixed_y is None:
+##            self.fixed_y = [False]*(len(shell)+1)
+##        else:
+##            self.fixed_y = fixed_y
 
 
         #fixed_x oder y: Liste mit True oder False der Länge der Punkteliste
@@ -30,16 +46,23 @@ class Shape(geometry.Polygon):
         #object.is_simple -> True wenn keine Überschneidung mit sich selbst
         #object.area
         #...
-    
-def display_shape(shape):
-    outer_x, outer_y = shape.exterior.xy
-    inner = shape.interiors
-    plt.fill(outer_x, outer_y)
-    for shape in inner:
-        x, y = shape.xy
-        plt.fill(x,y, color = 'w')
-    plt.show()
-if __name__=='__main__':
-    s = Shape([(0, 0), (2,8), (10, 10), (10, 0)],[[(1,1), (1,2), (2,1)]])
-    display_shape(s)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
