@@ -71,6 +71,11 @@ class Startpage(tk.Frame):
 
         f = matplotlib.figure.Figure()
         self.plot = f.add_subplot(111)
+        
+        #um die Zahlen an den Achsen unsichtbar zu machen
+##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+        
         self.canvas = FigureCanvasTkAgg(f, topbox)
         self.canvas.draw()
         toolbar = NavigationToolbar2Tk(self.canvas, topbox)
@@ -86,6 +91,10 @@ class Startpage(tk.Frame):
         
         self.plot.clear()
         self.plot.autoscale(autoscale)
+
+        #um die Zahlen an den Achsen unsichtbar zu machen
+##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
         
         if comparison_shape is not None:
             self.plot.plot(*comparison_shape.exterior.xy, color='red')
