@@ -1,5 +1,22 @@
 from shapely import geometry
 import matplotlib.pyplot as plt
+import numpy as np
+
+def evened_out_point(point, neighbour1, neighbour2):
+    px, py = point
+    n1x, n1y = neighbour1
+    n2x, n2y = neighbour2
+    mx = (n2x + n1x)/2
+    my = (n2y + n1y)/2
+
+    #in Matrixschreibweise AX=B
+    A = np.array([[n2x-n1x, n1y-n2y],[n2y-n1y, n2x-n1x]])
+    B = np.array([mx-px, my-py])
+    t,u = np.linalg.solve(A,B)
+
+    x = px + t*(n2x - n1x)
+    y = py + t*(n2y - n1y)
+    return(x,y)
 
 class Shape(geometry.Polygon):
     def __init__(self, shell, holes=None, move_restrictions=None, fixed_displacements=None, forces=None):
@@ -48,8 +65,8 @@ class Shape(geometry.Polygon):
         #...
 
 
-
-
+if __name__=='__main__':
+    print(evened_out_point((1,4), (0,0), (10,0)))
 
 
 
