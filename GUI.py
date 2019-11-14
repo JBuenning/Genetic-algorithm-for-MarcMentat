@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-from shape import Shape
+import shape
 import time
 
 class GUI(tk.Tk):
@@ -133,20 +133,21 @@ class MarcMentatPage(tk.Frame):
 
 
 def create_example_polygon():
-    return Shape([(0,0),(200,200),(200,100),(100,0)],holes=[[(100,50), (150,100), (125,50)]])
+    return shape.Shape([(0,0),(200,200),(200,100),(100,0)],holes=[[(100,50), (150,100), (125,50)]])
 
 def second_example_polygon():
-    return Shape([(0,0), (20,80), (100,100), (100,0)],[[(10,10), (10,20), (20,10)]])
+    return shape.Shape([(0,0), (20,80), (100,100), (100,0)],[[(10,10), (10,20), (20,10)]])
 
+def complicated_polygon():
+    return shape.Shape([(0,0), (3,1), (5,4), (7,4), (16,12), (6,7), (3,8), (1,7), (-1,5), (-3,3), (-2,1)])
 
 
 gui = GUI()
-example = create_example_polygon()
-second_example = second_example_polygon()
+example = complicated_polygon()
 gui.update()
 gui.draw_shape(example, comparison_shape=example, autoscale=True)
 gui.update()
-time.sleep(2)
+second_example = shape.even_out_shape(example)
 gui.draw_shape(second_example, comparison_shape=example, autoscale=True)
 gui.update()
 

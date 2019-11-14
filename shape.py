@@ -1,12 +1,13 @@
 from shapely import geometry
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
-def evened_out_point(point, neighbour1, neighbour2, restriction=False):
+def even_out_point(point, neighbour1, neighbour2, restriction=False):
     px, py = point
     n1x, n1y = neighbour1
     n2x, n2y = neighbour2
-    mx = (n2x + n1x)/2
+    mx = (n2x + n1x)/2#mitte zwischen den Nachbarpunkten
     my = (n2y + n1y)/2
     
     if restriction:
@@ -32,6 +33,23 @@ def evened_out_point(point, neighbour1, neighbour2, restriction=False):
         x = px + t*(n2x - n1x)
         y = py + t*(n2y - n1y)
     return(x,y)
+
+def even_out_shape(shape, n_times=1):
+    coords = shape.exterior.coords[:-1]
+    for i in range(len(coords)):
+        coords[i-1] = even_out_point(coords[i-1], coords[i], coords[i-2])
+
+    shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+    return shape
+    
+
+def change_shape_simple(shape, n_times):
+    #erst mal nur für das Äußere
+    coords = shape.exterior.coords[:-1]
+    n2 = random.randrange(len(coords))
+    choice = n2 - 1
+    n1 = n2 - 2
+    
 
 class Shape(geometry.Polygon):
     def __init__(self, shell, holes=None, move_restrictions=None, fixed_displacements=None, forces=None):
@@ -81,7 +99,7 @@ class Shape(geometry.Polygon):
 
 
 if __name__=='__main__':
-    print(evened_out_point((1,4), (0,0), (10,0), restriction=(0,1)))
+    print(even_out_point((1,4), (0,0), (10,0), restriction=(0,1)))
 
 
 
