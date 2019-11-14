@@ -71,6 +71,7 @@ class Startpage(tk.Frame):
 
         f = matplotlib.figure.Figure()
         self.plot = f.add_subplot(111)
+        self.plot.set_aspect('equal', adjustable='datalim')#x- und y- achse gleich skaliert
         
         #um die Zahlen an den Achsen unsichtbar zu machen
 ##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
@@ -90,7 +91,7 @@ class Startpage(tk.Frame):
     def draw_shape(self, shape, comparison_shape, autoscale):
         
         self.plot.clear()
-        self.plot.autoscale(autoscale)
+        self.plot.autoscale(autoscale)#funktioniert noch nicht
 
         #um die Zahlen an den Achsen unsichtbar zu machen
 ##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
@@ -139,17 +140,26 @@ def second_example_polygon():
     return shape.Shape([(0,0), (20,80), (100,100), (100,0)],[[(10,10), (10,20), (20,10)]])
 
 def complicated_polygon():
-    return shape.Shape([(0,0), (3,1), (5,4), (7,4), (16,12), (6,7), (3,8), (1,7), (-1,5), (-3,3), (-2,1)])
+    return shape.Shape([(0,0), (3,1), (5,4), (7,4), (9,5), (6,7), (3,8), (1,7), (-1,5), (-3,3), (-2,1)])
 
 
 gui = GUI()
 example = complicated_polygon()
-gui.update()
+example2 = complicated_polygon()
 gui.draw_shape(example, comparison_shape=example, autoscale=True)
 gui.update()
-second_example = shape.even_out_shape(example)
-gui.draw_shape(second_example, comparison_shape=example, autoscale=True)
-gui.update()
+
+for i in range(100):
+    example2 = shape.change_shape_simple(example2)
+    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+    time.sleep(0.2)
+gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+    
+
+##second_example = shape.even_out_shape(example, 1)
+##third_example = shape.even_out_shape(second_example)
+##gui.draw_shape(third_example, comparison_shape=second_example, autoscale=True)
+##gui.update()
 
 
 

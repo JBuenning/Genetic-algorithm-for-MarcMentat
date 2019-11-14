@@ -2,8 +2,10 @@ from shapely import geometry
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+import math
 
 def even_out_point(point, neighbour1, neighbour2, restriction=False):
+    #hilfsfunktion für even_out_shape
     px, py = point
     n1x, n1y = neighbour1
     n2x, n2y = neighbour2
@@ -35,22 +37,57 @@ def even_out_point(point, neighbour1, neighbour2, restriction=False):
     return(x,y)
 
 def even_out_shape(shape, n_times=1):
+    #bisher nur äussere form
     coords = shape.exterior.coords[:-1]
     for i in range(len(coords)):
         coords[i-1] = even_out_point(coords[i-1], coords[i], coords[i-2])
 
     shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    return shape
+    if n_times == 1:
+        return shape
+    else:
+        return even_out_shape(shape, n_times - 1)
+
+def move_point(point, neighbour1, neighbour2, movement, restriction):
+    #Hilfsfuntion für change_shape
+    n1x, n1y = neighbour1
+    n2x, n2y = neighbour2
+    px, py = point
+    if restriction:
+        movement_x, movement_Y = restriction
+    else:
+        movement_x = n2y - n1y
+        movement_y = n1x - n2x
+
+    movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(n2x-n1x, 2) + math.pow(n2y-n1y, 2)))
+
+    x = px + movement*movement_x
+    y = py + movement*movement_y
+
+    return (x,y)
+
     
 
-def change_shape_simple(shape, n_times):
+def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
+    #min und max movement beziehen sich auf die Distanz zwischen den Nachbarpunkten.
+    #ein movement von 1 würde bedeuten, dass der Punkt sich um die Länge der Entfernung der Nachbarpunkte zueinander bewegt
     #erst mal nur für das Äußere
     coords = shape.exterior.coords[:-1]
     n2 = random.randrange(len(coords))
     choice = n2 - 1
     n1 = n2 - 2
-    
 
+    #mögliches Problem: Form wird größer, weil Überschneidung unwahrscheinlicher
+    movement = random.uniform(min_movement, max_movement)
+    movement = movement * random.choice([1,-1])
+    coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
+    shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+    shape = even_out_shape(shape, 2)
+    print('noch keine Validierung, es können auch unzulässige Formen entstehen')
+    return shape #noch keine Validierung
+    
+    
+    
 class Shape(geometry.Polygon):
     def __init__(self, shell, holes=None, move_restrictions=None, fixed_displacements=None, forces=None):
         super().__init__(shell, holes)
@@ -71,23 +108,6 @@ class Shape(geometry.Polygon):
             self.forces=forces
             
         
-##        if fixed_x is None:
-##            self.fixed_x = [False]*(len(shell)+1)#möglicher Konflikt, wenn erster Punkt doppelt genannt wird!!!
-##        else:
-##            self.fixed_x = fixed_x
-##
-##        if fixed_y is None:
-##            self.fixed_y = [False]*(len(shell)+1)
-##        else:
-##            self.fixed_y = fixed_y
-
-
-        #fixed_x oder y: Liste mit True oder False der Länge der Punkteliste
-        #innere Punkte dürfen immer bewegt werden (vorerst)
-        # Liste soll so aussehen: [True, False, False,...]
-        #Das würde bedeuten erster punkt ist fixiert, zweiter und dritter nicht...
-        
-
         #einige Methoden und Attribute, die schon da sind:
             
         #object.exterior.coords -> Liste mit äußeren Koordinaten [(x,y),(x,y)...]
@@ -99,7 +119,7 @@ class Shape(geometry.Polygon):
 
 
 if __name__=='__main__':
-    print(even_out_point((1,4), (0,0), (10,0), restriction=(0,1)))
+    pass
 
 
 
