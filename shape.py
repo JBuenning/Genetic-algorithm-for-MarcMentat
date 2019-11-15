@@ -5,7 +5,26 @@ import random
 import math
 
 
-def even_out_point(point, neighbour1, neighbour2, restriction=False):
+def get_realistic_example():
+    shell = [(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(9,0),(10,0),(11,0),(12,0),(13,0),(14,0),
+             (14,1),(14,2),(14,3),
+             (13,3),(12,3),(11,3),(10,3),(9,3),(8,3),(7,3),(6,3),(5,3),(4,3),(3,3),
+             (3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13),
+             (3,14),(2,14),(1,14),
+             (0,14),(0,13),(0,12),(0,11),(0,10),(0,9),(0,8),(0,7),(0,6),(0,5),(0,4),(0,3),(0,2),(0,1)]
+    print(len(shell))
+
+    move_restrictions = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,
+                         (0,1),(0,1),(0,1),
+                         False,False,False,False,False,False,False,False,False,False,False,
+                         False,False,False,False,False,False,False,False,False,False,
+                         (1,0),(1,0),(1,0),
+                         True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+
+    print(len(move_restrictions))
+    return Shape(shell, move_restrictions=move_restrictions)
+
+def even_out_point(point, neighbour1, neighbour2, restriction):
     #hilfsfunktion für even_out_shape
     px, py = point
     n1x, n1y = neighbour1
@@ -27,8 +46,8 @@ def even_out_point(point, neighbour1, neighbour2, restriction=False):
             except:
                 #wenn der Punkt sich wegen der restriction nur senkrecht zu den Nachbarpunkten bewegen dürfte
                 x, y = point
-            else:
-                x, y = point
+        else:
+            x, y = point
 
     else:
         #in Matrixschreibweise AX=B
@@ -44,7 +63,7 @@ def even_out_shape(shape, n_times=1):
     #bisher nur äussere form
     coords = shape.exterior.coords[:-1]
     for i in range(len(coords)):
-        coords[i-1] = even_out_point(coords[i-1], coords[i], coords[i-2])
+        coords[i-1] = even_out_point(coords[i-1], coords[i], coords[i-2], shape.move_restrictions[i-1])
 
     shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
     if n_times == 1:
@@ -59,7 +78,7 @@ def move_point(point, neighbour1, neighbour2, movement, restriction):
     px, py = point
     if restriction:
         if type(restriction) is tuple:
-            movement_x, movement_Y = restriction
+            movement_x, movement_y = restriction
         else:
             return point
     else:
@@ -90,9 +109,9 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
     coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
     coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
     s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    s = even_out_shape(s, 2)
+    s = even_out_shape(s, 3)
     s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    s_neg = even_out_shape(s_neg, 2)
+    s_neg = even_out_shape(s_neg, 3)
     while (not s.is_valid) or (not s.is_simple) or (not s_neg.is_valid) or (not s_neg.is_simple):
         if movement <= min_movement:
             print('das sollte besser nicht zu oft hintereinander zu sehen sein')
@@ -106,9 +125,9 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
             coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
             coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
             s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-            s = even_out_shape(s, 2)
+            s = even_out_shape(s, 3)
             s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-            s_neg = even_out_shape(s_neg, 2)
+            s_neg = even_out_shape(s_neg, 3)
     return random.choice([s, s_neg])
     
     
@@ -144,7 +163,7 @@ class Shape(geometry.Polygon):
 
 
 if __name__=='__main__':
-    pass
+    get_realistic_example()
 
 
 
