@@ -13,18 +13,21 @@ def even_out_point(point, neighbour1, neighbour2, restriction=False):
     my = (n2y + n1y)/2
     
     if restriction:
-        restriction_x, restriction_y = restriction
-        #in Matrixschreibweise AX=B
-        try:
-            A = np.array([[restriction_x, n1y-n2y],[restriction_y, n2x-n1x]])
-            B = np.array([mx-px, my-py])
-            t,u = np.linalg.solve(A,B)
+        if type(restriction) is tuple:
+            restriction_x, restriction_y = restriction
+            #in Matrixschreibweise AX=B
+            try:
+                A = np.array([[restriction_x, n1y-n2y],[restriction_y, n2x-n1x]])
+                B = np.array([mx-px, my-py])
+                t,u = np.linalg.solve(A,B)
 
-            x = px + t*(restriction_x)
-            y = py + t*(restriction_y)
-        except:
-            #wenn der Punkt sich wegen der restriction nur senkrecht zu den Nachbarpunkten bewegen dürfte
-            x, y = point
+                x = px + t*(restriction_x)
+                y = py + t*(restriction_y)
+            except:
+                #wenn der Punkt sich wegen der restriction nur senkrecht zu den Nachbarpunkten bewegen dürfte
+                x, y = point
+            else:
+                x, y = point
 
     else:
         #in Matrixschreibweise AX=B
@@ -54,7 +57,10 @@ def move_point(point, neighbour1, neighbour2, movement, restriction):
     n2x, n2y = neighbour2
     px, py = point
     if restriction:
-        movement_x, movement_Y = restriction
+        if type(restriction) is tuple:
+            movement_x, movement_Y = restriction
+        else:
+            return point
     else:
         movement_x = n2y - n1y
         movement_y = n1x - n2x
@@ -73,18 +79,38 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
     #ein movement von 1 würde bedeuten, dass der Punkt sich um die Länge der Entfernung der Nachbarpunkte zueinander bewegt
     #erst mal nur für das Äußere
     coords = shape.exterior.coords[:-1]
+    coords_neg = shape.exterior.coords[:-1]
     n2 = random.randrange(len(coords))
     choice = n2 - 1
     n1 = n2 - 2
 
     #mögliches Problem: Form wird größer, weil Überschneidung unwahrscheinlicher
     movement = random.uniform(min_movement, max_movement)
-    movement = movement * random.choice([1,-1])
+    movement_neg = movement * (-1)
     coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
-    shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    shape = even_out_shape(shape, 2)
-    print('noch keine Validierung, es können auch unzulässige Formen entstehen')
-    return shape #noch keine Validierung
+    coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
+    s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+    s = even_out_shape(s, 2)
+    s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+    s_neg = even_out_shape(s_neg, 2)
+    while (not s.is_valid) or (not s.is_simple) or (not s_neg.is_valid) or (not s_neg.is_simple):
+        if movement <= min_movement:
+            print('das sollte besser nicht zu oft hintereinander zu sehen sein')
+            return change_shape_simple(shape, min_movement, max_movement, n_times)
+        else:
+            print('in while')
+            coords = shape.exterior.coords[:-1]
+            coords_neg = shape.exterior.coords[:-1]
+            movement = movement/2
+            movement_neg = movement_neg/2
+            coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
+            coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
+            s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+            s = even_out_shape(s, 2)
+            s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+            s_neg = even_out_shape(s_neg, 2)
+    #print('noch keine Validierung, es können auch unzulässige Formen entstehen')
+    return random.choice([s, s_neg]) #noch keine Validierung
     
     
     
