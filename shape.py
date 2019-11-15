@@ -12,7 +12,6 @@ def get_realistic_example():
              (3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13),
              (3,14),(2,14),(1,14),
              (0,14),(0,13),(0,12),(0,11),(0,10),(0,9),(0,8),(0,7),(0,6),(0,5),(0,4),(0,3),(0,2),(0,1)]
-    print(len(shell))
 
     move_restrictions = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,
                          (0,1),(0,1),(0,1),
@@ -21,45 +20,44 @@ def get_realistic_example():
                          (1,0),(1,0),(1,0),
                          True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 
-    print(len(move_restrictions))
     return Shape(shell, move_restrictions=move_restrictions)
 
-def even_out_point(point, neighbour1, neighbour2, restriction):
-    #hilfsfunktion für even_out_shape
-    px, py = point
-    n1x, n1y = neighbour1
-    n2x, n2y = neighbour2
-    mx = (n2x + n1x)/2#mitte zwischen den Nachbarpunkten
-    my = (n2y + n1y)/2
-    
-    if restriction:
-        if type(restriction) is tuple:
-            restriction_x, restriction_y = restriction
-            #in Matrixschreibweise AX=B
-            try:
-                A = np.array([[restriction_x, n1y-n2y],[restriction_y, n2x-n1x]])
-                B = np.array([mx-px, my-py])
-                t,u = np.linalg.solve(A,B)
-
-                x = px + t*(restriction_x)
-                y = py + t*(restriction_y)
-            except:
-                #wenn der Punkt sich wegen der restriction nur senkrecht zu den Nachbarpunkten bewegen dürfte
-                x, y = point
-        else:
-            x, y = point
-
-    else:
-        #in Matrixschreibweise AX=B
-        A = np.array([[n2x-n1x, n1y-n2y],[n2y-n1y, n2x-n1x]])
-        B = np.array([mx-px, my-py])
-        t,u = np.linalg.solve(A,B)
-
-        x = px + t*(n2x - n1x)
-        y = py + t*(n2y - n1y)
-    return(x,y)
-
 def even_out_shape(shape, n_times=1):
+
+    def even_out_point(point, neighbour1, neighbour2, restriction):
+        #hilfsfunktion für even_out_shape
+        px, py = point
+        n1x, n1y = neighbour1
+        n2x, n2y = neighbour2
+        mx = (n2x + n1x)/2#mitte zwischen den Nachbarpunkten
+        my = (n2y + n1y)/2
+        
+        if restriction:
+            if type(restriction) is tuple:
+                restriction_x, restriction_y = restriction
+                #in Matrixschreibweise AX=B
+                try:
+                    A = np.array([[restriction_x, n1y-n2y],[restriction_y, n2x-n1x]])
+                    B = np.array([mx-px, my-py])
+                    t,u = np.linalg.solve(A,B)
+
+                    x = px + t*(restriction_x)
+                    y = py + t*(restriction_y)
+                except:
+                    #wenn der Punkt sich wegen der restriction nur senkrecht zu den Nachbarpunkten bewegen dürfte
+                    x, y = point
+            else:
+                x, y = point
+
+        else:
+            #in Matrixschreibweise AX=B
+            A = np.array([[n2x-n1x, n1y-n2y],[n2y-n1y, n2x-n1x]])
+            B = np.array([mx-px, my-py])
+            t,u = np.linalg.solve(A,B)
+
+            x = px + t*(n2x - n1x)
+            y = py + t*(n2y - n1y)
+        return(x,y)
     #bisher nur äussere form
     coords = shape.exterior.coords[:-1]
     for i in range(len(coords)):
@@ -70,39 +68,44 @@ def even_out_shape(shape, n_times=1):
         return shape
     else:
         return even_out_shape(shape, n_times - 1)
-
-def move_point(point, neighbour1, neighbour2, movement, restriction):
-    #Hilfsfuntion für change_shape
-    n1x, n1y = neighbour1
-    n2x, n2y = neighbour2
-    px, py = point
-    if restriction:
-        if type(restriction) is tuple:
-            movement_x, movement_y = restriction
-        else:
-            return point
-    else:
-        movement_x = n2y - n1y
-        movement_y = n1x - n2x
-
-    movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(n2x-n1x, 2) + math.pow(n2y-n1y, 2)))
-
-    x = px + movement*movement_x
-    y = py + movement*movement_y
-
-    return (x,y)
-
     
 
 def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
+    def move_point(point, neighbour1, neighbour2, movement, restriction):
+        #Hilfsfuntion für change_shape
+        n1x, n1y = neighbour1
+        n2x, n2y = neighbour2
+        px, py = point
+        if restriction:
+            if type(restriction) is tuple:
+                movement_x, movement_y = restriction
+            else:
+                return point
+        else:
+            movement_x = n2y - n1y
+            movement_y = n1x - n2x
+
+        movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(n2x-n1x, 2) + math.pow(n2y-n1y, 2)))
+
+        x = px + movement*movement_x
+        y = py + movement*movement_y
+        return (x,y)
+
     #min und max movement beziehen sich auf die Distanz zwischen den Nachbarpunkten.
     #ein movement von 1 würde bedeuten, dass der Punkt sich um die Länge der Entfernung der Nachbarpunkte zueinander bewegt
     #erst mal nur für das Äußere
     coords = shape.exterior.coords[:-1]
     coords_neg = shape.exterior.coords[:-1]
-    n2 = random.randrange(len(coords))
-    choice = n2 - 1
-    n1 = n2 - 2
+    random_selection = []
+    for i in range(len(coords)):
+        if (not shape.move_restrictions[i]) or (type(shape.move_restrictions[i]) is tuple):
+            random_selection.append(i)
+    choice = random.choice(random_selection)
+    if choice == len(coords)-1:
+        n2 = 0
+    else:
+        n2 = choice+1
+    n1 = choice - 1
 
     movement = random.uniform(min_movement, max_movement)
     movement_neg = movement * (-1)
@@ -117,7 +120,6 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
             print('das sollte besser nicht zu oft hintereinander zu sehen sein')
             return change_shape_simple(shape, min_movement, max_movement, n_times)
         else:
-            print('in while')
             coords = shape.exterior.coords[:-1]
             coords_neg = shape.exterior.coords[:-1]
             movement = movement/2
@@ -163,7 +165,7 @@ class Shape(geometry.Polygon):
 
 
 if __name__=='__main__':
-    get_realistic_example()
+    pass
 
 
 
