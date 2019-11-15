@@ -103,9 +103,21 @@ class Startpage(tk.Frame):
             interiors = comparison_shape.interiors
             for interior in interiors:
                 self.plot.plot(*interior.xy, color='red')
+
+        markercolors = []
+        for restriction in shape.move_restrictions:
+            if restriction:
+                if type(restriction) is tuple:
+                    markercolors.append('yellow')
+                else:
+                    markercolors.append('red')
+            else:
+                markercolors.append('black')
+        markercolors.append(markercolors[0])
         
         self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
-        self.plot.plot(*shape.exterior.xy, marker = 'o', color='black')
+        self.plot.plot(*shape.exterior.xy, color='black')
+        self.plot.scatter(*shape.exterior.xy, color=markercolors)
 
         interiors = shape.interiors
         for interior in interiors:

@@ -4,6 +4,7 @@ import numpy as np
 import random
 import math
 
+
 def even_out_point(point, neighbour1, neighbour2, restriction=False):
     #hilfsfunktion für even_out_shape
     px, py = point
@@ -84,7 +85,6 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
     choice = n2 - 1
     n1 = n2 - 2
 
-    #mögliches Problem: Form wird größer, weil Überschneidung unwahrscheinlicher
     movement = random.uniform(min_movement, max_movement)
     movement_neg = movement * (-1)
     coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
@@ -109,8 +109,7 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
             s = even_out_shape(s, 2)
             s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
             s_neg = even_out_shape(s_neg, 2)
-    #print('noch keine Validierung, es können auch unzulässige Formen entstehen')
-    return random.choice([s, s_neg]) #noch keine Validierung
+    return random.choice([s, s_neg])
     
     
     
