@@ -14,14 +14,16 @@ def get_realistic_example():
              (0,14),(0,13),(0,12),(0,11),(0,10),(0,9),(0,8),(0,7),(0,6),(0,5),(0,4),(0,3),(0,2),(0,1)]
 
     move_restrictions = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,
-                         (0,1),(0,1),(0,1),
+                         True,True,True,
                          False,False,False,False,False,False,False,False,False,False,False,
                          False,False,False,False,False,False,False,False,False,False,
-                         (1,0),(1,0),(1,0),
+                         True,True,True,
                          True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 
     return Shape(shell, move_restrictions=move_restrictions)
 
+#n_times - wie oft soll der algorithmus laufen
+#Algorithmus macht gleiche Abstände zwischen Punkten ohne Fläche und Form stark zu verändern
 def even_out_shape(shape, n_times=1):
 
     def even_out_point(point, neighbour1, neighbour2, restriction):
@@ -69,7 +71,9 @@ def even_out_shape(shape, n_times=1):
     else:
         return even_out_shape(shape, n_times - 1)
     
-
+#zufällige Form
+#max_movement - in prozent bezogen auf abstand beider nachbarpunkte zueinander
+#min_movement - siehe max
 def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
     def move_point(point, neighbour1, neighbour2, movement, restriction):
         #Hilfsfuntion für change_shape
@@ -132,8 +136,12 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
             s_neg = even_out_shape(s_neg, 3)
     return random.choice([s, s_neg])
     
-    
-    
+#shell - Liste mit tuples (Koordinaten)
+#move_restrictions - gleiche länge wie shell
+    #Ture - darf sich bewegen 
+    #False - darf sich nicht bewegen
+    #tuple - Vektor in welche Richtung Punkt sich bewegen darf
+#fixed_displacement - gleiche lände wie shell, enthält tuples mit x = True/False und y=True/False
 class Shape(geometry.Polygon):
     def __init__(self, shell, holes=None, move_restrictions=None, fixed_displacements=None, forces=None):
         super().__init__(shell, holes)
