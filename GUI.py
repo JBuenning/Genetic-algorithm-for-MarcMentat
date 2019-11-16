@@ -162,7 +162,7 @@ print('sdglj')
 gui.draw_shape(example, comparison_shape=example, autoscale=True)
 gui.update()
 
-for i in range(100):
+for i in range(1000):
     example2 = shape.change_shape_simple(example2)
     gui.draw_shape(example2, comparison_shape=example, autoscale=True)
     time.sleep(0.2)
