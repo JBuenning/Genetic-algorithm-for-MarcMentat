@@ -105,10 +105,73 @@ def even_out_shape(shape, n_times=1):
     else:
         return even_out_shape(shape, n_times - 1)
     
+#ähnlicher Algorithmus wie change_shape_one. Der Unterschied ist, das dieser Algorithmus die Tendenz hat, dünne Strukturen zu vermeiden.
+#Daher wird die Fläche der Form tendentiell größer
+#zusätzlich: round shape, wenn eine bestimmte reursion depth erreicht ist
+def change_shape_three(shape, min_movement=0.1, max_movement=1, max_recursiondepth=3, endless_loop_counter=0):
+    def move_point(point, neighbour1, neighbour2, movement, restriction):#ist die gleiche Funktion wie bei change_shape_one
+        #Hilfsfuntion für change_shape
+        n1x, n1y = neighbour1
+        n2x, n2y = neighbour2
+        px, py = point
+        if restriction:
+            if type(restriction) is tuple:
+                movement_x, movement_y = restriction
+            else:
+                return point
+        else:
+            movement_x = n2y - n1y
+            movement_y = n1x - n2x
+
+        movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(n2x-n1x, 2) + math.pow(n2y-n1y, 2)))
+
+        x = px + movement*movement_x
+        y = py + movement*movement_y
+        return (x,y)
+
+    coords = shape.exterior.coords[:-1]
+    random_selection = []
+    for i in range(len(coords)):
+        if (not shape.move_restrictions[i]) or (type(shape.move_restrictions[i]) is tuple):
+            random_selection.append(i)
+    choice = random.choice(random_selection)
+    if choice == len(coords)-1:
+        n2 = 0
+    else:
+        n2 = choice+1
+    n1 = choice - 1
+
+    movement = random.uniform(min_movement, max_movement)
+    movement = movement * random.choice([1, -1])
+    coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
+    s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+    s = even_out_shape(s, 3)
+    #s = round_shape(s, 1)
+    while (not s.is_valid) or (not s.is_simple):
+        
+        if movement <= min_movement:
+            if endless_loop_counter >= max_recursiondepth:
+                print('round shape')
+                return change_shape_three(round_shape(shape), min_movement, max_movement, max_recursiondepth, 0)
+            else:
+
+                print('das sollte besser nicht zu oft hintereinander zu sehen sein')
+                return change_shape_three(shape, min_movement, max_movement, max_recursiondepth, endless_loop_counter+1)
+        else:
+            endless_loop_counter +=1
+            coords = shape.exterior.coords[:-1]
+            movement = movement/2
+            coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
+            s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+            s = even_out_shape(s, 3)
+            #s = round_shape(s, 1)
+    return s
+
+
 #zufällige Form
 #max_movement - in prozent bezogen auf abstand beider nachbarpunkte zueinander
 #min_movement - siehe max
-def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
+def change_shape_one(shape, min_movement=0.1, max_movement=1, n_times=1):
     def move_point(point, neighbour1, neighbour2, movement, restriction):
         #Hilfsfuntion für change_shape
         n1x, n1y = neighbour1
@@ -158,7 +221,7 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
     while (not s.is_valid) or (not s.is_simple) or (not s_neg.is_valid) or (not s_neg.is_simple):
         if movement <= min_movement:
             print('das sollte besser nicht zu oft hintereinander zu sehen sein')
-            return change_shape_simple(shape, min_movement, max_movement, n_times)
+            return change_shape_one(shape, min_movement, max_movement, n_times)
         else:
             coords = shape.exterior.coords[:-1]
             coords_neg = shape.exterior.coords[:-1]
