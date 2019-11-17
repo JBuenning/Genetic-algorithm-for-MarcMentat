@@ -41,7 +41,7 @@ def get_cool_example():
                         False,False,False,False,False,False,False,False,
                         False,False,False,False,False,False,False,False,False,False,False,False,False,
                         True,True,True,True,True,True,True,
-                        False,False,False,False,False,False,False,False,False,False,False,False]                        ]
+                        False,False,False,False,False,False,False,False,False,False,False,False,False]
     return Shape(shell, move_restrictions=move_restrictions)
 
 #Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner

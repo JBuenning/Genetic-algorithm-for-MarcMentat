@@ -156,8 +156,8 @@ def complicated_polygon():
 
 
 gui = GUI()
-example = shape.get_realistic_example()
-example2 = shape.get_realistic_example()
+example = shape.get_cool_example()
+example2 = shape.get_cool_example()
 gui.draw_shape(example, comparison_shape=example, autoscale=True)
 gui.update()
 
