@@ -22,8 +22,38 @@ def get_realistic_example():
 
     return Shape(shell, move_restrictions=move_restrictions)
 
+
+#Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner
+#jeder Puktk wird dabei genau zwischen seine beiden Nachbarpunkte verschoben
+#glicht noch nicht die Interiors aus
+#teilweise beschränkte Bewegung fehlt noch
+#es wird nicht überprüft, ob die Shape, die zurückgegeben wird, zulässig ist
+def round_shape(shape, n_times=1):
+    def round_point(point, neighbour1, neighbour2, restriction):
+        if restriction:
+            if type(restriction) is tuple:
+                raise NotImplementedError('partially restricted movement not supported yet')
+            else:
+                return point
+        else:
+            n1x, n1y = neighbour1
+            n2x, n2y = neighbour2
+            mx = (n2x + n1x)/2
+            my = (n2y + n1y)/2
+            return (mx, my)
+
+    coords = shape.exterior.coords[:-1]
+    for j in range(len(coords)):
+        coords[j-1] = round_point(coords[j-1], coords[j], coords[j-2], shape.move_restrictions[j-1])
+        shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+    if n_times == 1:
+        return shape
+    else:
+        return round_shape(shape, n_times - 1)
+
 #n_times - wie oft soll der algorithmus laufen
-#Algorithmus macht gleiche Abstände zwischen Punkten ohne Fläche und Form stark zu verändern
+#Algorithmus macht ähnliche Abstände zwischen Punkten ohne Fläche und Form stark zu verändern
+#es wird nicht überprüft, ob die Shape, die zurückgegeben wird, zulässig ist
 def even_out_shape(shape, n_times=1):
 
     def even_out_point(point, neighbour1, neighbour2, restriction):
@@ -41,7 +71,7 @@ def even_out_shape(shape, n_times=1):
                 try:
                     A = np.array([[restriction_x, n1y-n2y],[restriction_y, n2x-n1x]])
                     B = np.array([mx-px, my-py])
-                    t,u = np.linalg.solve(A,B)
+                    t,_ = np.linalg.solve(A,B)
 
                     x = px + t*(restriction_x)
                     y = py + t*(restriction_y)
@@ -55,7 +85,7 @@ def even_out_shape(shape, n_times=1):
             #in Matrixschreibweise AX=B
             A = np.array([[n2x-n1x, n1y-n2y],[n2y-n1y, n2x-n1x]])
             B = np.array([mx-px, my-py])
-            t,u = np.linalg.solve(A,B)
+            t,_ = np.linalg.solve(A,B)
 
             x = px + t*(n2x - n1x)
             y = py + t*(n2y - n1y)
@@ -117,8 +147,10 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
     coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
     s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
     s = even_out_shape(s, 3)
+    #s = round_shape(s, 1)
     s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
     s_neg = even_out_shape(s_neg, 3)
+    #s_neg =round_shape(s_neg, 1)
     while (not s.is_valid) or (not s.is_simple) or (not s_neg.is_valid) or (not s_neg.is_simple):
         if movement <= min_movement:
             print('das sollte besser nicht zu oft hintereinander zu sehen sein')
@@ -132,8 +164,10 @@ def change_shape_simple(shape, min_movement=0.1, max_movement=1, n_times=1):
             coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
             s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
             s = even_out_shape(s, 3)
+            #s = round_shape(s, 1)
             s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
             s_neg = even_out_shape(s_neg, 3)
+            #s_neg =round_shape(s_neg, 1)
     return random.choice([s, s_neg])
     
 #shell - Liste mit tuples (Koordinaten)
