@@ -72,6 +72,25 @@ def even_out_shape(shape, n_times=1):
         return even_out_shape(shape, n_times - 1)
 
 def change_shape_two(shape, min_movement=0.1, max_movement=1):
+    def move_point(point, start, end, movement, restriction):
+        sx, sy = start
+        ex, ey = end
+        px, py = point
+        if restriction:
+            if type(restriction) is tuple:
+                movement_x, movement_y = restriction
+            else:
+                pass
+        else:
+            movement_x = ey - sy
+            movement_y = sx - ex
+
+        movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(ex-sx, 2) + math.pow(ey-sy, 2)))
+
+        x = px + movement*movement_x
+        y = py + movement*movement_y
+        coords[coords.index(point)] = (x,y)
+        
     coords = shape.exterior.coords[:-1]
     coords_free = []
     coords_change = []
@@ -85,7 +104,10 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     start_coord = coords_change[0]
     end_coord = coords_change[len(coords_change)-1]
     mid_coord = coords_change[int((len(coords_change)-1)/2)+random.randint(0,1)]
-    return shape
+    move_point(mid_coord,start_coord,end_coord,1,False)
+    s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
+    s = even_out_shape(s, 3)
+    return s
 
 #zufällige Form
 #max_movement - in prozent bezogen auf abstand beider nachbarpunkte zueinander
