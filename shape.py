@@ -21,7 +21,28 @@ def get_realistic_example():
                          True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 
     return Shape(shell, move_restrictions=move_restrictions)
-
+def get_cool_example():
+    shell = [(0,8),(0,9),(0,10),(0,11),(0,12),(0,13),(0,14),(0,15),(0,16),(1,16),(2,16),(2,15),
+            (2,14),(3,14),(4,14),(5,14),(6,14),(6,15),(6,16),(7,16),(8,16),(8,15),(8,14),
+            (9,14),(10,14),(11,14),(12,14),(13,14),(14,14),(14,15),(14,16),(15,16),(16,16),(16,15),
+            (16,14),(17,14),(18,14),(19,14),(20,14),(20,15),(20,16),(21,16),(22,16),
+            (22,15),(22,14),(22,13),(22,12),(22,11),(22,10),(22,9),(22,8),
+            (21,8),(20,8),(19,8),(18,8),(17,8),(16,8),(15,7),(14,6),
+            (14,5),(14,4),(14,3),(14,2),(14,1),(14,0),(13,0),(12,0),(11,0),(10,0),(9,0),(8,0),
+            (8,1),(8,2),(8,3),(8,4),(8,5),(8,6),(7,7),(6,8),(5,8),(4,8),(3,8),(2,8),(1,8)]
+    move_restrictions = [False,False,False,False,False,False,False,False,
+                        True,True,True,
+                        False,False,False,False,False,False,False,
+                        True,True,True,
+                        False,False,False,False,False,False,False,False,False,
+                        True,True,True,
+                        False,False,False,False,False,False,False,
+                        True,True,True,
+                        False,False,False,False,False,False,False,False,
+                        False,False,False,False,False,False,False,False,False,False,False,False,False,
+                        True,True,True,True,True,True,True,
+                        False,False,False,False,False,False,False,False,False,False,False,False]                        ]
+    return Shape(shell, move_restrictions=move_restrictions)
 
 #Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner
 #jeder Puktk wird dabei genau zwischen seine beiden Nachbarpunkte verschoben
