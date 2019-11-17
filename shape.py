@@ -146,7 +146,6 @@ def change_shape_three(shape, min_movement=0.1, max_movement=1, max_recursiondep
     coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
     s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
     s = even_out_shape(s, 3)
-    #s = round_shape(s, 1)
     while (not s.is_valid) or (not s.is_simple):
         
         if movement <= min_movement:
@@ -163,14 +162,13 @@ def change_shape_three(shape, min_movement=0.1, max_movement=1, max_recursiondep
             coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
             s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
             s = even_out_shape(s, 3)
-            #s = round_shape(s, 1)
     return s
 
 
 #zufällige Form
 #max_movement - in prozent bezogen auf abstand beider nachbarpunkte zueinander
 #min_movement - siehe max
-def change_shape_one(shape, min_movement=0.1, max_movement=1, n_times=1):
+def change_shape_one(shape, min_movement=0.1, max_movement=1, max_recursiondepth=20, endless_loop_counter=0):
     def move_point(point, neighbour1, neighbour2, movement, restriction):
         #Hilfsfuntion für change_shape
         n1x, n1y = neighbour1
@@ -219,8 +217,13 @@ def change_shape_one(shape, min_movement=0.1, max_movement=1, n_times=1):
     #s_neg =round_shape(s_neg, 1)
     while (not s.is_valid) or (not s.is_simple) or (not s_neg.is_valid) or (not s_neg.is_simple):
         if movement <= min_movement:
-            print('das sollte besser nicht zu oft hintereinander zu sehen sein')
-            return change_shape_one(shape, min_movement, max_movement, n_times)
+            if endless_loop_counter >= max_recursiondepth:
+                print('round shape')
+                return change_shape_one(round_shape(shape), min_movement, max_movement, max_recursiondepth, 0)
+            else:
+                print('das sollte besser nicht zu oft hintereinander zu sehen sein')
+                return change_shape_one(shape, min_movement, max_movement, max_recursiondepth, endless_loop_counter+1)
+
         else:
             coords = shape.exterior.coords[:-1]
             coords_neg = shape.exterior.coords[:-1]
