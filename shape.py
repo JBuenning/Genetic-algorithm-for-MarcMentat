@@ -108,7 +108,7 @@ def even_out_shape(shape, n_times=1):
 #ähnlicher Algorithmus wie change_shape_one. Der Unterschied ist, das dieser Algorithmus die Tendenz hat, dünne Strukturen zu vermeiden.
 #Daher wird die Fläche der Form tendentiell größer
 #zusätzlich: round shape, wenn eine bestimmte reursion depth erreicht ist
-def change_shape_three(shape, min_movement=0.1, max_movement=1, max_recursiondepth=3, endless_loop_counter=0):
+def change_shape_three(shape, min_movement=0.1, max_movement=1, max_recursiondepth=4, endless_loop_counter=0):
     def move_point(point, neighbour1, neighbour2, movement, restriction):#ist die gleiche Funktion wie bei change_shape_one
         #Hilfsfuntion für change_shape
         n1x, n1y = neighbour1
@@ -158,7 +158,6 @@ def change_shape_three(shape, min_movement=0.1, max_movement=1, max_recursiondep
                 print('das sollte besser nicht zu oft hintereinander zu sehen sein')
                 return change_shape_three(shape, min_movement, max_movement, max_recursiondepth, endless_loop_counter+1)
         else:
-            endless_loop_counter +=1
             coords = shape.exterior.coords[:-1]
             movement = movement/2
             coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
