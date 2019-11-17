@@ -43,7 +43,9 @@ def round_shape(shape, n_times=1):
             return (mx, my)
 
     coords = shape.exterior.coords[:-1]
-    for j in range(len(coords)):
+    indices = list(range(len(coords)))
+    random.shuffle(indices)
+    for j in indices:
         coords[j-1] = round_point(coords[j-1], coords[j], coords[j-2], shape.move_restrictions[j-1])
         shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
     if n_times == 1:
@@ -92,7 +94,9 @@ def even_out_shape(shape, n_times=1):
         return(x,y)
     #bisher nur äussere form
     coords = shape.exterior.coords[:-1]
-    for i in range(len(coords)):
+    indices = list(range(len(coords)))
+    random.shuffle(indices)
+    for i in indices:
         coords[i-1] = even_out_point(coords[i-1], coords[i], coords[i-2], shape.move_restrictions[i-1])
 
     shape = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
