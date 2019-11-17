@@ -75,15 +75,16 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     coords = shape.exterior.coords[:-1]
     coords_free = []
     coords_change = []
+    min_num_changed_coords = 1
     for i, coord in enumerate(coords):
         if shape.move_restrictions[i] == False: #später anpassen auf teilweise eingeschränkte Punkte
             coords_free.append(coord)
-    print('free {}'.format(len(coords_free)))
     start = random.randint(0,int(len(coords_free)/2))#int(len(coords2)/2) nur zum ausprobieren kann auch anders gewählt werden
-    print(start)
-    for i in range(start,random.randint(start+3,len(coords_free)-1)):#len(coords_free)-1 eventuell stärker eingrenzen
+    for i in range(start,random.randint(start+min_num_changed_coords+2,len(coords_free)-1)):#len(coords_free)-1 eventuell stärker eingrenzen
         coords_change.append(coords_free[i])
-    print('change {}'.format(len(coords_change)))
+    start_coord = coords_change[0]
+    end_coord = coords_change[len(coords_change)-1]
+    mid_coord = coords_change[int((len(coords_change)-1)/2)+random.randint(0,1)]
     return shape
 
 #zufällige Form
