@@ -44,6 +44,38 @@ def get_cool_example():
                         False,False,False,False,False,False,False,False,False,False,False,False,False]
     return Shape(shell, move_restrictions=move_restrictions)
 
+def get_distance(point1,point2):
+    x1,y1 = point1
+    x2,y2 = point2
+    dx = x2 - x1
+    dy = y2 - y1
+    return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
+
+def join_shapes(shape1,shape2):
+    coords1 = shape1.exterior.coords[:-1]
+    coords2 = shape2.exterior.coords[:-1]
+    coords = [coords1,coords2]
+    start_points = []
+    smallest_distance = 9999999
+
+    for point1 in coords1:
+        for point2 in coords2:
+            if get_distance(point1,point2) < smallest_distance:
+                smallest_distance = get_distance(point1,point2)
+                start_points.append([point1,point2])
+    coords_new = []
+    for i in range(2):
+        array = []
+        j = coords[i].index(start_points[i])
+        while j < len(coords[i]):
+            array.append(coords[i][j])
+        for point in coords[i]:
+            if point == start_points[i]:
+                break
+            else:
+                array.append(point)
+        coords_new.append(array)
+    coords1,coords2 = coords_new
 #Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner
 #jeder Puktk wird dabei genau zwischen seine beiden Nachbarpunkte verschoben
 #glicht noch nicht die Interiors aus
