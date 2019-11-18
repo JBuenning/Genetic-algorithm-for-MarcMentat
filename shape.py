@@ -51,10 +51,19 @@ def get_distance(point1,point2):
     dy = y2 - y1
     return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
 
+def mean_between_points(point1,point2):
+    x1,y1 = point1
+    x2,y2 = point2
+    x = (x1+x2)/2
+    y = (y1+y2)/2
+    return (x,y)
+
 def join_shapes(shape1,shape2):
     coords1 = shape1.exterior.coords[:-1]
     coords2 = shape2.exterior.coords[:-1]
     coords = [coords1,coords2]
+    if len(coords1) == len(coords2):
+        print('Achtung ganz böse Ausnahme hier fehlt noch etwas Programmierarbeit um beide Listen auf die gleich eLänge zu bringen')
     start_points = []
     smallest_distance = 9999999
 
@@ -63,7 +72,7 @@ def join_shapes(shape1,shape2):
             if get_distance(point1,point2) < smallest_distance:
                 smallest_distance = get_distance(point1,point2)
                 start_points.append([point1,point2])
-    coords_new = []
+    coords_sorted = []
     for i in range(2):
         array = []
         j = coords[i].index(start_points[i])
@@ -74,8 +83,16 @@ def join_shapes(shape1,shape2):
                 break
             else:
                 array.append(point)
-        coords_new.append(array)
-    coords1,coords2 = coords_new
+        coords_sorted.append(array)
+    coords1,coords2 = coords_sorted
+    
+    coords_new = []
+    for i in range(len(coords1)):
+        coords_new.append(mean_between_points(coords1[i],coords2[i]))
+    ### Hier muss noch überprüft werden ob denn restrictions usw bei beidne shapes übereinstimmen
+    return Shape(coords_new, shape1.interiors, shape1.move_restrictions, shape1.fixed_displacements, shape1.forces)
+
+
 #Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner
 #jeder Puktk wird dabei genau zwischen seine beiden Nachbarpunkte verschoben
 #glicht noch nicht die Interiors aus
