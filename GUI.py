@@ -164,7 +164,7 @@ gui.update()
 for i in range(1000):
     example2 = shape.change_shape_one(example2)
     gui.draw_shape(example2, comparison_shape=example, autoscale=True)
-    #time.sleep(0.2)
+    time.sleep(0)
     
 input()
 ##second_example = shape.even_out_shape(example, 1)

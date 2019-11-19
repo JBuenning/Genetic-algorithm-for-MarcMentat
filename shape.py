@@ -51,14 +51,16 @@ def get_distance(point1,point2):
     dy = y2 - y1
     return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
 
-def mean_between_points(point1,point2):
+def point_between_points(point1,point2,factor):#factor- 0.5 entspricht dem mittel
     x1,y1 = point1
     x2,y2 = point2
-    x = (x1+x2)/2
-    y = (y1+y2)/2
+    x = (x1+x2)*factor
+    y = (y1+y2)*factor
     return (x,y)
 
 def join_shapes(shape1,shape2):
+    random_range = 0.2
+
     coords1 = shape1.exterior.coords[:-1]
     coords2 = shape2.exterior.coords[:-1]
     coords = [coords1,coords2]
@@ -88,7 +90,7 @@ def join_shapes(shape1,shape2):
     
     coords_new = []
     for i in range(len(coords1)):
-        coords_new.append(mean_between_points(coords1[i],coords2[i]))
+        coords_new.append(point_between_points(coords1[i],coords2[i],random.uniform(0.5-(random_range/2),0.6+(random_range/2))))
     ### Hier muss noch überprüft werden ob denn restrictions usw bei beidne shapes übereinstimmen
     return Shape(coords_new, shape1.interiors, shape1.move_restrictions, shape1.fixed_displacements, shape1.forces)
 
