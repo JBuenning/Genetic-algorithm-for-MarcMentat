@@ -24,6 +24,8 @@ class GUI(tk.Tk):
         self.pages["marcMentat"].grid(row=0, column=0, sticky="nsew")
         self.pages["startpage"] = Startpage(backroundframe)
         self.pages["startpage"].grid(row=0, column=0, sticky="nsew")
+        self.pages["mergingpage"] = Mergingpage(backroundframe)
+        self.pages["mergingpage"].grid(row=0, column=0, sticky="nsew")
 
         #menubar
         menu = tk.Menu(self)
@@ -39,6 +41,7 @@ class GUI(tk.Tk):
         #settings
         settings = tk.Menu()
         settings.add_command(label="marcMentat", command=lambda: self.show_frame("marcMentat"))
+        settings.add_command(label="mergingpage", command=lambda: self.show_frame("mergingpage"))
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
@@ -125,7 +128,71 @@ class Startpage(tk.Frame):
             self.plot.plot(*interior.xy, marker = 'o', color='black')
 
         self.canvas.draw()
-            
+
+class Mergingpage(tk.Frame):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        topbox = tk.Frame(self)
+        topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        f = matplotlib.figure.Figure()
+        self.plot = f.add_subplot(111)
+        self.plot.set_aspect('equal', adjustable='datalim')#x- und y- achse gleich skaliert
+        
+        #um die Zahlen an den Achsen unsichtbar zu machen
+##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+        
+        self.canvas = FigureCanvasTkAgg(f, topbox)
+        self.canvas.draw()
+        toolbar = NavigationToolbar2Tk(self.canvas, topbox)
+        toolbar.update()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        rightbox = tk.Frame(self, bg='red')
+        right_label = tk.Label(rightbox, text='Platz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
+        right_label.pack()
+        rightbox.pack(side=tk.RIGHT, fill=tk.Y)
+
+    def draw_shape(self, shape, comparison_shape, autoscale):
+        
+        self.plot.clear()
+        self.plot.autoscale(autoscale)#funktioniert noch nicht
+
+        #um die Zahlen an den Achsen unsichtbar zu machen
+##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+        
+        if comparison_shape is not None:
+            self.plot.plot(*comparison_shape.exterior.xy, color='red')
+
+            interiors = comparison_shape.interiors
+            for interior in interiors:
+                self.plot.plot(*interior.xy, color='red')
+
+        markercolors = []
+        for restriction in shape.move_restrictions:
+            if restriction:
+                if type(restriction) is tuple:
+                    markercolors.append('yellow')
+                else:
+                    markercolors.append('red')
+            else:
+                markercolors.append('black')
+        markercolors.append(markercolors[0])
+        
+        self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
+        self.plot.plot(*shape.exterior.xy, color='black')
+        self.plot.scatter(*shape.exterior.xy, color=markercolors)
+
+        interiors = shape.interiors
+        for interior in interiors:
+            self.plot.fill(*interior.xy, color='white')
+            self.plot.plot(*interior.xy, marker = 'o', color='black')
+
+        self.canvas.draw()        
 
 class MarcMentatPage(tk.Frame):
 
