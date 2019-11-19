@@ -90,6 +90,7 @@ def join_shapes(shape1,shape2):
         j = coords[i].index(start_points[i])
         while j < len(coords[i]):
             array.append(coords[i][j])
+            j += 1
         for point in coords[i]:
             if point == start_points[i]:
                 break
@@ -100,7 +101,7 @@ def join_shapes(shape1,shape2):
     
     coords_new = []
     for i in range(len(coords1)):
-        coords_new.append(point_between_points(coords1[i],coords2[i],random.uniform(0.5-(random_range/2),0.6+(random_range/2))))
+        coords_new.append(point_between_points(coords1[i],coords2[i],0.5))
     ### Hier muss noch überprüft werden ob denn restrictions usw bei beidne shapes übereinstimmen
     return Shape(coords_new, shape1.interiors, shape1.move_restrictions, shape1.fixed_displacements, shape1.forces)
 
@@ -359,13 +360,6 @@ class Shape(geometry.Polygon):
 
 if __name__=='__main__':
     pass
-
-
-
-
-
-
-
 
 
 
