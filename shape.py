@@ -44,6 +44,16 @@ def get_cool_example():
                         False,False,False,False,False,False,False,False,False,False,False,False,False]
     return Shape(shell, move_restrictions=move_restrictions)
 
+def merge_example_1():
+    shell = [(0,0),(1,2),(1,4),(1,6),(0,8),(2,8),(4,8),(6,8),(8,8),(8,6),(8,4),(8,2),(8,0),(6,0),(4,0),(2,0)]
+    move_restrictions = [True,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False]
+    return Shape(shell, move_restrictions=move_restrictions)
+
+def merge_example_2():
+    shell = [(2,6),(3,6),(4,6),(5,6),(6,6),(6,5),(6,4),(6,3),(6,2),(5,2),(4,2),(3,2),(2,2),(2,3),(2,4),(2,5)]
+    move_restrictions = [False,False,False,False,False,False,False,False,False,False,False,False,True,False,False,False]
+    return Shape(shell, move_restrictions=move_restrictions)
+
 def get_distance(point1,point2):
     x1,y1 = point1
     x2,y2 = point2
@@ -64,7 +74,7 @@ def join_shapes(shape1,shape2):
     coords1 = shape1.exterior.coords[:-1]
     coords2 = shape2.exterior.coords[:-1]
     coords = [coords1,coords2]
-    if len(coords1) == len(coords2):
+    if len(coords1) != len(coords2):
         print('Achtung ganz böse Ausnahme hier fehlt noch etwas Programmierarbeit um beide Listen auf die gleich eLänge zu bringen')
     start_points = []
     smallest_distance = 9999999
@@ -73,7 +83,7 @@ def join_shapes(shape1,shape2):
         for point2 in coords2:
             if get_distance(point1,point2) < smallest_distance:
                 smallest_distance = get_distance(point1,point2)
-                start_points.append([point1,point2])
+                start_points = [point1,point2]
     coords_sorted = []
     for i in range(2):
         array = []

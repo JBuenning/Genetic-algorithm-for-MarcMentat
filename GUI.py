@@ -45,11 +45,15 @@ class GUI(tk.Tk):
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
-        self.show_frame("startpage")
+        self.show_frame("mergingpage")
 
     def draw_shape(self, shape, comparison_shape=None, autoscale=True):
         #zeichnet das Polygon
         self.pages["startpage"].draw_shape(shape, comparison_shape, autoscale)
+    
+    def draw_shape_merge(self, shape1,shape2, comparison_shape=None, autoscale=True):
+        #zeichnet das Polygon
+        self.pages["mergingpage"].draw_shapes(shape1,shape2, comparison_shape, autoscale)
 
     def show_frame(self, name):
         #wechselt zwischen den Frames, die den ganzen Platz im Fenster einnehmen
@@ -156,7 +160,7 @@ class Mergingpage(tk.Frame):
         right_label.pack()
         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
 
-    def draw_shape(self, shape, comparison_shape, autoscale):
+    def draw_shapes(self, shape1, shape2, merged_shape, autoscale):
         
         self.plot.clear()
         self.plot.autoscale(autoscale)#funktioniert noch nicht
@@ -164,34 +168,35 @@ class Mergingpage(tk.Frame):
         #um die Zahlen an den Achsen unsichtbar zu machen
 ##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
 ##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-        
-        if comparison_shape is not None:
-            self.plot.plot(*comparison_shape.exterior.xy, color='red')
+        ### Merged_shape
+        if merged_shape is not None:
+            self.plot.plot(*merged_shape.exterior.xy, color='red')
 
-            interiors = comparison_shape.interiors
+            interiors = merged_shape.interiors
             for interior in interiors:
                 self.plot.plot(*interior.xy, color='red')
 
-        markercolors = []
-        for restriction in shape.move_restrictions:
-            if restriction:
-                if type(restriction) is tuple:
-                    markercolors.append('yellow')
+        ### Shape 1 and 2
+        for shape in [shape1,shape2]:
+            markercolors = []
+            for restriction in shape.move_restrictions:
+                if restriction:
+                    if type(restriction) is tuple:
+                        markercolors.append('yellow')
+                    else:
+                        markercolors.append('red')
                 else:
-                    markercolors.append('red')
-            else:
-                markercolors.append('black')
-        markercolors.append(markercolors[0])
-        
-        self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
-        self.plot.plot(*shape.exterior.xy, color='black')
-        self.plot.scatter(*shape.exterior.xy, color=markercolors)
+                    markercolors.append('black')
+            markercolors.append(markercolors[0])
+            
+            self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
+            self.plot.plot(*shape.exterior.xy, color='black')
+            self.plot.scatter(*shape.exterior.xy, color=markercolors)
 
-        interiors = shape.interiors
-        for interior in interiors:
-            self.plot.fill(*interior.xy, color='white')
-            self.plot.plot(*interior.xy, marker = 'o', color='black')
-
+            interiors = shape.interiors
+            for interior in interiors:
+                self.plot.fill(*interior.xy, color='white')
+                self.plot.plot(*interior.xy, marker = 'o', color='black')
         self.canvas.draw()        
 
 class MarcMentatPage(tk.Frame):
@@ -223,16 +228,18 @@ def complicated_polygon():
 
 
 gui = GUI()
-example = shape.get_cool_example()
-example2 = shape.get_cool_example()
-gui.draw_shape(example, comparison_shape=example, autoscale=True)
-gui.update()
+#example = shape.get_cool_example()
+#example2 = shape.get_cool_example()
+#gui.draw_shape(example, comparison_shape=example, autoscale=True)
 
-for i in range(1000):
-    example2 = shape.change_shape_one(example2)
-    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
-    time.sleep(0)
-    
+
+#for i in range(1000):
+#    example2 = shape.change_shape_one(example2)
+#    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+#    time.sleep(0)
+#print(shape.join_shapes(shape.merge_example_1(),shape.merge_example_2()).exterior.coords)
+gui.draw_shape_merge(shape.merge_example_1(),shape.merge_example_2(),shape.merge_example_2())
+gui.update()
 input()
 ##second_example = shape.even_out_shape(example, 1)
 ##third_example = shape.even_out_shape(second_example)
