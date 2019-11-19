@@ -171,7 +171,7 @@ class Mergingpage(tk.Frame):
         ### Merged_shape
         if merged_shape is not None:
             self.plot.plot(*merged_shape.exterior.xy, color='red')
-
+            self.plot.scatter(*merged_shape.exterior.xy, color='red')
             interiors = merged_shape.interiors
             for interior in interiors:
                 self.plot.plot(*interior.xy, color='red')

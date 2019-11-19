@@ -50,6 +50,11 @@ def merge_example_1():
     return Shape(shell, move_restrictions=move_restrictions)
 
 def merge_example_2():
+    shell = [(2,2),(2,3),(2,4),(2,5),(2,6),(3,6),(4,6),(5,6),(6,6),(6,5),(6,4),(6,3),(6,2),(5,2),(4,2),(3,2)]
+    move_restrictions = [False,False,False,False,False,False,False,False,False,False,False,False,True,False,False,False]
+    return Shape(shell, move_restrictions=move_restrictions)
+
+def merge_example_2_wrong():
     shell = [(2,6),(3,6),(4,6),(5,6),(6,6),(6,5),(6,4),(6,3),(6,2),(5,2),(4,2),(3,2),(2,2),(2,3),(2,4),(2,5)]
     move_restrictions = [False,False,False,False,False,False,False,False,False,False,False,False,True,False,False,False]
     return Shape(shell, move_restrictions=move_restrictions)
@@ -76,29 +81,30 @@ def join_shapes(shape1,shape2):
     coords = [coords1,coords2]
     if len(coords1) != len(coords2):
         print('Achtung ganz böse Ausnahme hier fehlt noch etwas Programmierarbeit um beide Listen auf die gleich eLänge zu bringen')
-    start_points = []
-    smallest_distance = 9999999
-
-    for point1 in coords1:
-        for point2 in coords2:
-            if get_distance(point1,point2) < smallest_distance:
-                smallest_distance = get_distance(point1,point2)
-                start_points = [point1,point2]
-    coords_sorted = []
-    for i in range(2):
-        array = []
-        j = coords[i].index(start_points[i])
-        while j < len(coords[i]):
-            array.append(coords[i][j])
-            j += 1
-        for point in coords[i]:
-            if point == start_points[i]:
-                break
-            else:
-                array.append(point)
-        coords_sorted.append(array)
-    coords1,coords2 = coords_sorted
     
+    if False:
+        start_points = []
+        smallest_distance = 9999999
+        for point1 in coords1:
+            for point2 in coords2:
+                if get_distance(point1,point2) < smallest_distance:
+                    smallest_distance = get_distance(point1,point2)
+                    start_points = [point1,point2]
+        coords_sorted = []
+        for i in range(2):
+            array = []
+            j = coords[i].index(start_points[i])
+            while j < len(coords[i]):
+                array.append(coords[i][j])
+                j += 1
+            for point in coords[i]:
+                if point == start_points[i]:
+                    break
+                else:
+                    array.append(point)
+            coords_sorted.append(array)
+        coords1,coords2 = coords_sorted
+
     coords_new = []
     for i in range(len(coords1)):
         coords_new.append(point_between_points(coords1[i],coords2[i],0.5))
