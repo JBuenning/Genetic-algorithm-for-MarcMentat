@@ -81,8 +81,7 @@ def smallest_distance_point_shape(point,shape,point_in_shape):
         try:
             t=(s[0]-x1)/m1[0]
         except:
-            print('FEHLER')
-            t=99
+            t=(s[1]-y1)/m1[1]
         if t<=1 and t>=0:
             return [get_distance(point,s),None]
         else:
