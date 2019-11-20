@@ -43,6 +43,15 @@ def get_cool_example():
                         True,True,True,True,True,True,True,
                         False,False,False,False,False,False,False,False,False,False,False,False,False]
     return Shape(shell, move_restrictions=move_restrictions)
+
+def get_distance(point1,point2):
+    x1,y1 = point1
+    x2,y2 = point2
+    dx = x2 - x1
+    dy = y2 - y1
+    return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
+
+
 def line_intersection(line1, line2): 
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0]) 
     ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1]) #Typo was here 
@@ -61,17 +70,21 @@ def line_intersection(line1, line2):
 
 
 def smallest_distance_point_shape(point,shape):
-    def intersect_point_line(point,line):
+    def smallest_distance_point_line(point,line):
         x1,y1=line[0]
         x2,y2=line[1]
-        px1,py2=point
+        px1,py1=point
         m1=(x2-x1,y2-y1)
         m2=(m1[1],-m1[0])
         px2=px1+m2[0]
         py2=py1+m2[1]
         s = line_intersection(line,[point,(px2,py2)])
-        return s
-
+        t=(s[0]-x1)/m1[0]
+        if t<=1 and t>=0:
+            return get_distance(point,s)
+        else:
+            return min(get_distance(point,line[0]),get_distance(point,line[1]))
+        
     coords = shape.exterior.coords[:-1]
     lines = []
     for i in range(1,len(coords)):
