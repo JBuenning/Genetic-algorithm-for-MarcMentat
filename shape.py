@@ -68,8 +68,7 @@ def line_intersection(line1, line2):
     y = det(d, ydiff)/div 
     return x, y 
 
-
-def smallest_distance_point_shape(point,shape):
+def smallest_distance_point_shape(point,shape,point_in_shape):
     def smallest_distance_point_line(point,line):
         x1,y1=line[0]
         x2,y2=line[1]
@@ -79,18 +78,40 @@ def smallest_distance_point_shape(point,shape):
         px2=px1+m2[0]
         py2=py1+m2[1]
         s = line_intersection(line,[point,(px2,py2)])
-        t=(s[0]-x1)/m1[0]
+        try:
+            t=(s[0]-x1)/m1[0]
+        except:
+            print('FEHLER')
+            t=99
         if t<=1 and t>=0:
-            return get_distance(point,s)
+            return [get_distance(point,s),None]
         else:
-            return min(get_distance(point,line[0]),get_distance(point,line[1]))
+            return [min(get_distance(point,line[0]),get_distance(point,line[1])),line]
         
     coords = shape.exterior.coords[:-1]
     lines = []
+    smallest_distance= None
     for i in range(1,len(coords)):
         lines.append([coords[i-1],coords[i]])
-    lines.append([coord[len(coords)-1],coords[0]])
-
+    lines.append([coords[len(coords)-1],coords[0]])
+    
+    for line in lines:
+        if point_in_shape:
+            if point in line:
+                continue
+        if smallest_distance==None or smallest_distance_point_line(point,line)[0] < smallest_distance[0]:
+            smallest_distance = smallest_distance_point_line(point,line)
+    
+    if point_in_shape and smallest_distance[1] != None: #gar nicht schön gelöst aber wichtig 
+        n1 = coords[coords.index(point)-1]
+        if coords.index(point) == len(coords)-1:
+            n2 = coords[0]
+        else:
+            n2 = coords[coords.index(point)+1]
+        if n1 in smallest_distance[1] or n2 in smallest_distance[1]: #nicht die schönste Lösung
+            return [smallest_distance[0],True]#True - kürzeste Distanz liegt auf der Umrandung des Polygons
+    return [smallest_distance[0],False]#False - kürzeste Distanz liegt nicht auf der Umrandung des Polygons
+        
 #Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner
 #jeder Puktk wird dabei genau zwischen seine beiden Nachbarpunkte verschoben
 #glicht noch nicht die Interiors aus
@@ -345,19 +366,3 @@ class Shape(geometry.Polygon):
 
 if __name__=='__main__':
     pass
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
