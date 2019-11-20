@@ -43,6 +43,40 @@ def get_cool_example():
                         True,True,True,True,True,True,True,
                         False,False,False,False,False,False,False,False,False,False,False,False,False]
     return Shape(shell, move_restrictions=move_restrictions)
+def line_intersection(line1, line2): 
+    xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0]) 
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1]) #Typo was here 
+
+    def det(a, b): 
+     return a[0] * b[1] - a[1] * b[0] 
+
+    div = det(xdiff, ydiff) 
+    if div == 0: 
+     raise Exception('lines do not intersect') 
+
+    d = (det(*line1), det(*line2)) 
+    x = det(d, xdiff)/div 
+    y = det(d, ydiff)/div 
+    return x, y 
+
+
+def smallest_distance_point_shape(point,shape):
+    def intersect_point_line(point,line):
+        x1,y1=line[0]
+        x2,y2=line[1]
+        px1,py2=point
+        m1=(x2-x1,y2-y1)
+        m2=(m1[1],-m1[0])
+        px2=px1+m2[0]
+        py2=py1+m2[1]
+        s = line_intersection(line,[point,(px2,py2)])
+        return s
+
+    coords = shape.exterior.coords[:-1]
+    lines = []
+    for i in range(1,len(coords)):
+        lines.append([coords[i-1],coords[i]])
+    lines.append([coord[len(coords)-1],coords[0]])
 
 #Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner
 #jeder Puktk wird dabei genau zwischen seine beiden Nachbarpunkte verschoben
