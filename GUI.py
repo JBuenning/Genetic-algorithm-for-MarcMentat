@@ -84,9 +84,22 @@ class Startpage(tk.Frame):
         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         rightbox = tk.Frame(self, bg='red')
-        right_label = tk.Label(rightbox, text='Platz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
-        right_label.pack()
         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
+
+        frame_random_shape_settings = ttk.Labelframe(rightbox, text='irgendwelche Settings')
+        frame_random_shape_settings.pack(fill=tk.BOTH, expand=True)
+        marcMentat_commands = ttk.Labelframe(rightbox, text='MarcMentat commands')
+        marcMentat_commands.pack(fill=tk.BOTH, expand=True)
+        right_label = tk.Label(frame_random_shape_settings, text='\nwelcher Algorithmus,\nwie oft,\nvielleicht auch\nAnzahl formen pro Generation usw')
+        right_label.pack()
+        self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
+        self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
+
+    def get_mentat_commands(self):
+        #gibt eine Liste (einen Tuple) aus strings zurück
+        #jeder String wird als command an Mentat weitergegeben, nachdem die Form eingelesen 
+        #und Kräfte angetragen wurden
+        return self.mentat_commandlist.get_all_items()
 
     def draw_shape(self, shape, comparison_shape, autoscale):
         
@@ -144,6 +157,65 @@ class MarcMentatPage(tk.Frame):
         close.pack(side=tk.RIGHT, pady=4, padx=4)
         bottombox.pack(side=tk.BOTTOM, fill=tk.X)
 
+class Mentat_commandlist(tk.Frame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        topbox = tk.Frame(self)
+        topbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        scroll_y = tk.Scrollbar(topbox, orient=tk.VERTICAL)
+        scroll_x = tk.Scrollbar(topbox, orient=tk.HORIZONTAL)
+        self.listbox = tk.Listbox(topbox, selectmode=tk.SINGLE, yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+        scroll_y.config(command=self.listbox.yview)
+        scroll_x.config(command=self.listbox.xview)
+        scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+        scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
+        self.listbox.pack(fill=tk.BOTH, expand=True)
+        self.listbox.bind('<Button-1>', self.setCurrent)
+        self.listbox.bind('<B1-Motion>', self.shiftSelection)
+        self.curIndex = None
+        self.listbox.insert(tk.END, '*af_planar_trimesh')
+        self.listbox.insert(tk.END, '*new_geometry *geometry_type mech_planar_pstress')
+
+        bottombox = tk.Frame(self)
+        bottombox.pack(side=tk.BOTTOM, fill=tk.X)
+        delete = ttk.Button(bottombox, text="delete", command=self.delete)
+        delete.pack(side=tk.LEFT, pady=4, padx=4)
+        add_item = ttk.Button(bottombox, text="add command", command=self.add_item)
+        add_item.pack(side=tk.LEFT, pady=4, padx=0)
+        self.entry = tk.Entry(bottombox)
+        self.entry.pack(side=tk.LEFT, pady=4, padx=0)
+        
+    def delete(self):
+        item = self.listbox.curselection()
+        if item:
+            self.listbox.delete(item)
+
+    def get_all_items(self):
+        all_items = self.listbox.get(0,'end')
+        return all_items
+
+    def add_item(self):
+        entry = self.entry.get()
+        if entry:
+            self.listbox.insert(tk.END, entry)
+            self.entry.delete(0,'end')
+            
+    def setCurrent(self, event):
+        self.curIndex = self.listbox.nearest(event.y)
+
+    def shiftSelection(self, event):
+        i = self.listbox.nearest(event.y)
+        if i < self.curIndex:
+            x = self.listbox.get(i)
+            self.listbox.delete(i)
+            self.listbox.insert(i+1, x)
+            self.curIndex = i
+        elif i > self.curIndex:
+            x = self.listbox.get(i)
+            self.listbox.delete(i)
+            self.listbox.insert(i-1, x)
+            self.curIndex = i
 
 def create_example_polygon():
     return shape.Shape([(0,0),(200,200),(200,100),(100,0)],holes=[[(100,50), (150,100), (125,50)]])
@@ -159,14 +231,14 @@ gui = GUI()
 example = shape.get_cool_example()
 example2 = shape.get_cool_example()
 gui.draw_shape(example, comparison_shape=example, autoscale=True)
-gui.update()
+gui.mainloop()
 
-for i in range(1000):
-    example2 = shape.change_shape_one(example2)
-    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+#for i in range(1000):
+    #example2 = shape.change_shape_one(example2)
+    #gui.draw_shape(example2, comparison_shape=example, autoscale=True)
     #time.sleep(0.2)
     
-input()
+#input()
 ##second_example = shape.even_out_shape(example, 1)
 ##third_example = shape.even_out_shape(second_example)
 ##gui.draw_shape(third_example, comparison_shape=second_example, autoscale=True)
