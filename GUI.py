@@ -156,9 +156,8 @@ def complicated_polygon():
 
 
 gui = GUI()
-example = shape.get_realistic_example()
-example2 = shape.get_realistic_example()
-print('sdglj')
+example = shape.get_cool_example()
+example2 = shape.get_cool_example()
 gui.draw_shape(example, comparison_shape=example, autoscale=True)
 gui.update()
 
@@ -167,7 +166,7 @@ for i in range(10000):
     gui.draw_shape(example2, comparison_shape=example, autoscale=True)
     time.sleep(0.05)
     
-
+input()
 ##second_example = shape.even_out_shape(example, 1)
 ##third_example = shape.even_out_shape(second_example)
 ##gui.draw_shape(third_example, comparison_shape=second_example, autoscale=True)
