@@ -3,6 +3,7 @@ from tkinter import ttk
 import matplotlib
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import shape
+import examples
 import time
 
 class GUI(tk.Tk):
@@ -216,20 +217,9 @@ class MarcMentatPage(tk.Frame):
         close.pack(side=tk.RIGHT, pady=4, padx=4)
         bottombox.pack(side=tk.BOTTOM, fill=tk.X)
 
-
-def create_example_polygon():
-    return shape.Shape([(0,0),(200,200),(200,100),(100,0)],holes=[[(100,50), (150,100), (125,50)]])
-
-def second_example_polygon():
-    return shape.Shape([(0,0), (20,80), (100,100), (100,0)],[[(10,10), (10,20), (20,10)]])
-
-def complicated_polygon():
-    return shape.Shape([(0,0), (3,1), (5,4), (7,4), (9,5), (6,7), (3,8), (1,7), (-1,5), (-3,3), (-2,1)])
-
-
 gui = GUI()
-#example = shape.get_cool_example()
-#example2 = shape.get_cool_example()
+#example = examples.get_cool_example()
+#example2 = examples.get_cool_example()
 #gui.draw_shape(example, comparison_shape=example, autoscale=True)
 
 
@@ -237,8 +227,8 @@ gui = GUI()
 #    example2 = shape.change_shape_one(example2)
 #    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
 #    time.sleep(0)
-#print(shape.join_shapes(shape.merge_example_1(),shape.merge_example_2()).exterior.coords)
-gui.draw_shape_merge(shape.merge_example_1(),shape.merge_example_2(),shape.join_shapes(shape.merge_example_1(),shape.merge_example_2()))
+#print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
+gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
 gui.update()
 input()
 ##second_example = shape.even_out_shape(example, 1)
