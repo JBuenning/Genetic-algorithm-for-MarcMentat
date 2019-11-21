@@ -268,12 +268,11 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     s = linear_function(shape,coords_change)
 
     ### Kontrollen ###
-    while not s.is_valid or not s.is_simple:
+    while not(s.is_valid) or not(s.is_simple) or not(s.is_thick()):
         s = change_shape_two(shape)
 
     ### Glätten ###
     s = even_out_shape(s, 3)
-    
     return s
 
 #zufällige Form
@@ -375,8 +374,8 @@ class Shape(geometry.Polygon):
         else:
             self.forces=forces
 
-    def is_thick(self):   
-        limit = shortest_line(self,'v')/2
+    def is_thick(self,factor=1):   
+        limit = shortest_line(self,'v')*factor
         for point in self.exterior.coords[:-1]:
             if smallest_distance_point_shape(point,self,True)[0] < limit:
                 return False
