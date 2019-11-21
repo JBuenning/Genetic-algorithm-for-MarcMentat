@@ -51,6 +51,13 @@ def get_distance(point1,point2):
     dy = y2 - y1
     return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
 
+def get_lines(shape):
+    coords = shape.exterior.coords[:-1]
+    lines = []
+    for i in range(1,len(coords)):
+        lines.append([coords[i-1],coords[i]])
+    lines.append([coords[len(coords)-1],coords[0]])
+    return lines
 
 def line_intersection(line1, line2): 
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0]) 
@@ -88,11 +95,8 @@ def smallest_distance_point_shape(point,shape,point_in_shape):
             return [min(get_distance(point,line[0]),get_distance(point,line[1])),line]
         
     coords = shape.exterior.coords[:-1]
-    lines = []
+    lines = get_lines(shape)
     smallest_distance= None
-    for i in range(1,len(coords)):
-        lines.append([coords[i-1],coords[i]])
-    lines.append([coords[len(coords)-1],coords[0]])
     
     for line in lines:
         if point_in_shape:
