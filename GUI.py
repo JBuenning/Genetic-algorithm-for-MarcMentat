@@ -218,17 +218,45 @@ class MarcMentatPage(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
 
-        topbox = tk.Frame(self, bg='red')
-        label = tk.Label(topbox, text="hier kann man später die Marcs verbinden")
-        label.pack()
-        topbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        topbox.grid_rowconfigure(0, weight=1)
-        topbox.grid_columnconfigure(0, weight=1)
+        self.connections = []
+
+        self.listbox = tk.Listbox(self)
+        #label = tk.Label(topbox, text="hier kann man später die Marcs verbinden")
+        #label.pack()
+        self.listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        #topbox.grid_rowconfigure(0, weight=1)
+        #topbox.grid_columnconfigure(0, weight=1)
 
         bottombox = tk.Frame(self)
         close = ttk.Button(bottombox, text="close", command=lambda: self.master.master.show_frame("startpage"))
         close.pack(side=tk.RIGHT, pady=4, padx=4)
+        test_all = ttk.Button(bottombox, text='test all', command=lambda: print('not supportet yet'))
+        test_all.pack(side=tk.LEFT, pady=4, padx=4)
         bottombox.pack(side=tk.BOTTOM, fill=tk.X)
+
+        middlebox = tk.Frame(self)
+        middlebox.pack(side=tk.BOTTOM, fill=tk.X)
+        tk.Label(middlebox, text='Host').grid(row=0, sticky=tk.W)
+        self.entry_host = tk.Entry(middlebox)
+        self.entry_host.grid(row=1)
+        tk.Label(middlebox, text='Port').grid(row=0, column=1, sticky=tk.W)
+        self.entry_port = tk.Entry(middlebox)
+        self.entry_port.grid(row=1, column=1)
+        add_item = ttk.Button(middlebox, text='add connection', command=self.add_item)
+        add_item.grid(row=1, column=2, padx=4)
+
+    def add_item(self):
+        host = self.entry_host.get()
+        port = self.entry_port.get()
+        if host:
+            try:
+                int(port)
+                self.listbox.insert(tk.END, 'HOST "{}", PORT {}'.format(host, port))
+                self.connections.append((host,int(port)))
+                self.entry_host.delete(0,'end')
+                self.entry_port.delete(0,'end')
+            except:
+                pass
 
 class Mentat_commandlist(tk.Frame):
     def __init__(self, master):
@@ -299,32 +327,7 @@ gui = GUI()
 #    time.sleep(0)
 #print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
 gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
+gui.mainloop()
 ##second_example = shape.even_out_shape(example, 1)
 ##third_example = shape.even_out_shape(second_example)
 ##gui.draw_shape(third_example, comparison_shape=second_example, autoscale=True)
-##gui.update()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
