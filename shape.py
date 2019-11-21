@@ -63,7 +63,7 @@ def shortest_line(shape,data_type):#data_type - l gibt line zurück, v den wert
     lines = get_lines(shape)
     shortest_line = None
     for line in lines:
-        if get_distance(line[0],line[1])<shortest_line or shortest_line == None:
+        if  shortest_line == None or get_distance(line[0],line[1])<shortest_line:
             if data_type == 'v':
                 shortest_line = get_distance(line[0],line[1])
             elif data_type == 'l':
@@ -374,7 +374,14 @@ class Shape(geometry.Polygon):
             self.forces = [(False),(False)]*len(shell)
         else:
             self.forces=forces
-            
+
+    def is_thick(self):   
+        limit = shortest_line(self,'v')/2
+        for point in self.exterior.coords[:-1]:
+            if smallest_distance_point_shape(point,self,True)[0] < limit:
+                return False
+        return True
+        
         
         #einige Methoden und Attribute, die schon da sind:
             
