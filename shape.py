@@ -90,7 +90,30 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
         x = px + movement*movement_x
         y = py + movement*movement_y
         coords[coords.index(point)] = (x,y)
-        
+
+    def linear_function(coords_change,):
+        ### Lineare Funktion ###
+        start_coord = coords_change[0]
+        end_coord = coords_change[len(coords_change)-1]
+        in_or_out = random.choice([-1,1])
+        if (len(coords_change) % 2) != 0:
+            r=0
+            start_len = end_len = int(len(coords_change)/2)+1
+        else:
+            r = random.randint(0,1)
+            if bool(r):
+                start_len = int(len(coords_change)/2)
+                end_len = int(len(coords_change)/2)+1
+            else:
+                start_len = int(len(coords_change)/2)+1
+                end_len = int(len(coords_change)/2)
+        #mid_coord = coords_change[int((len(coords_change)/2))-r]
+        for i in range(start_len):
+            move_point(coords_change[i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+        for i in range(end_len-1):
+            move_point(coords_change[len(coords_change)-1-i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+
+    ### Zu ändernde Koordinaten werden bestimmt ###
     coords = shape.exterior.coords[:-1]
     coords_free = []
     coords_change = []
@@ -101,30 +124,9 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     start = random.randint(0,int(len(coords_free)/2))#int(len(coords2)/2) nur zum ausprobieren kann auch anders gewählt werden
     for i in range(start,random.randint(start+min_num_changed_coords+2,len(coords_free)-1)):#len(coords_free)-1 eventuell stärker eingrenzen
         coords_change.append(coords_free[i])
-    start_coord = coords_change[0]
-    end_coord = coords_change[len(coords_change)-1]
-
-    ### Lineare Funktion ###
-    in_or_out = random.choice([-1,1])
-    if (len(coords_change) % 2) != 0:
-        r=0
-        start_len = end_len = int(len(coords_change)/2)+1
-    else:
-        r = random.randint(0,1)
-        if bool(r):
-            start_len = int(len(coords_change)/2)
-            end_len = int(len(coords_change)/2)+1
-        else:
-            start_len = int(len(coords_change)/2)+1
-            end_len = int(len(coords_change)/2)
-    #mid_coord = coords_change[int((len(coords_change)/2))-r]
-    for i in range(start_len):
-        move_point(coords_change[i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
-    for i in range(end_len-1):
-        move_point(coords_change[len(coords_change)-1-i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
-
-    #move_point(mid_coord,start_coord,end_coord,1,False)
-
+    
+    linear_function(coords_change)
+    
     s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
     s = even_out_shape(s, 3)
     return s
