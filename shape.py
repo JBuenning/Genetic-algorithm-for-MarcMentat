@@ -59,6 +59,17 @@ def get_lines(shape):
     lines.append([coords[len(coords)-1],coords[0]])
     return lines
 
+def shortest_line(shape,data_type):#data_type - l gibt line zurück, v den wert
+    lines = get_lines(shape)
+    shortest_line = None
+    for line in lines:
+        if get_distance(line[0],line[1])<shortest_line or shortest_line == None:
+            if data_type == 'v':
+                shortest_line = get_distance(line[0],line[1])
+            elif data_type == 'l':
+                shortest_line = line
+    return shortest_line
+        
 def line_intersection(line1, line2): 
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0]) 
     ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1]) #Typo was here 
