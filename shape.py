@@ -127,9 +127,16 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     for i in range(start,random.randint(start+min_num_changed_coords+2,len(coords_free)-1)):#len(coords_free)-1 eventuell stärker eingrenzen
         coords_change.append(coords_free[i])
     
+    ### Umformung ###
     s = linear_function(shape,coords_change)
-    
+
+    ### Kontrollen ###
+    while not s.is_valid or not s.is_simple:
+        s = change_shape_two(shape)
+
+    ### Glätten ###
     s = even_out_shape(s, 3)
+    
     return s
 
 #zufällige Form
