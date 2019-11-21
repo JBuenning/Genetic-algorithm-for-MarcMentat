@@ -89,10 +89,11 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
 
         x = px + movement*movement_x
         y = py + movement*movement_y
-        coords[coords.index(point)] = (x,y)
+        return (x,y)
 
-    def linear_function(coords_change,):
+    def linear_function(shape,coords_change):
         ### Lineare Funktion ###
+        coords = shape.exterior.coords[:-1]
         start_coord = coords_change[0]
         end_coord = coords_change[len(coords_change)-1]
         in_or_out = random.choice([-1,1])
@@ -109,9 +110,10 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
                 end_len = int(len(coords_change)/2)
         #mid_coord = coords_change[int((len(coords_change)/2))-r]
         for i in range(start_len):
-            move_point(coords_change[i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+            coords[coords.index(coords_change[i])] = move_point(coords_change[i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
         for i in range(end_len-1):
-            move_point(coords_change[len(coords_change)-1-i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+            coords[coords.index(coords_change[len(coords_change)-1-i])] = move_point(coords_change[len(coords_change)-1-i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+        return Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
 
     ### Zu ändernde Koordinaten werden bestimmt ###
     coords = shape.exterior.coords[:-1]
@@ -125,9 +127,8 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     for i in range(start,random.randint(start+min_num_changed_coords+2,len(coords_free)-1)):#len(coords_free)-1 eventuell stärker eingrenzen
         coords_change.append(coords_free[i])
     
-    linear_function(coords_change)
+    s = linear_function(shape,coords_change)
     
-    s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
     s = even_out_shape(s, 3)
     return s
 
