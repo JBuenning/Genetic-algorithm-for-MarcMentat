@@ -126,7 +126,7 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     #move_point(mid_coord,start_coord,end_coord,1,False)
 
     s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    #s = even_out_shape(s, 3)
+    s = even_out_shape(s, 3)
     return s
 
 #zufällige Form
