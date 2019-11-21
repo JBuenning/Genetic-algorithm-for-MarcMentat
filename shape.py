@@ -12,6 +12,21 @@ def get_distance(point1,point2):
     dy = y2 - y1
     return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
 
+def fine_mesh(shape):
+    coords = shape.exterior.coords[:-1]
+    move_restrictions = shape.move_restrictions
+    move_restrictions_new = []
+    coords_new = []
+    for i in range(len(coords)-1):
+        coords_new.append(coords[i])
+        move_restrictions_new.append(move_restrictions[i])
+        coords_new.append(point_between_points(coords[i],coords[i+1]))
+        move_restrictions_new.append(move_restrictions[i] or move_restrictions[i+1])
+    coords_new.append(point_between_points(coords[-1],coords[0]))
+    move_restrictions_new.append(not(not(move_restrictions[-1]) or not(move_restrictions[0])))
+
+    return Shape(coords_new, shape.interiors, move_restrictions_new, shape.fixed_displacements, shape.forces)
+
 def get_lines(shape):
     coords = shape.exterior.coords[:-1]
     lines = []
