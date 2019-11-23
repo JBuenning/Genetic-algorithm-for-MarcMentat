@@ -5,6 +5,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 import shape
 import examples
 import time
+from mentat_connection import HEADERSIZE, Task, Test_connection
+import socket
+import pickle
 
 class GUI(tk.Tk):
 
@@ -46,7 +49,7 @@ class GUI(tk.Tk):
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
-        self.show_frame("mergingpage")
+        self.show_frame("startpage")
 
     def draw_shape(self, shape, comparison_shape=None, autoscale=True):
         #zeichnet das Polygon
@@ -55,6 +58,9 @@ class GUI(tk.Tk):
     def draw_shape_merge(self, shape1,shape2, comparison_shape=None, autoscale=True):
         #zeichnet das Polygon
         self.pages["mergingpage"].draw_shapes(shape1,shape2, comparison_shape, autoscale)
+
+    def get_mentat_connections(self):
+        return self.pages['marcMentat'].get_connections()
 
     def show_frame(self, name):
         #wechselt zwischen den Frames, die den ganzen Platz im Fenster einnehmen
@@ -67,6 +73,37 @@ class GUI(tk.Tk):
 
     def save_as(self):
         print("save as")
+
+    def test_exampleshape(self):
+        for connection in self.get_mentat_connections():
+            HOST = connection[0]
+            PORT = connection[1]
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1)
+                try:
+                    s.connect((HOST, PORT))
+                    example_shape = examples.get_cool_example()
+                    obj_send = Task(list(example_shape.exterior.coords[:-1]), '','')#2. und 3. Argument muss natürlich noch gefüllt werden
+                    obj_bytes = pickle.dumps(obj_send)
+
+                    if len(str(len(obj_bytes)))>HEADERSIZE:
+                        raise Exception('Length of the object to send exceeds header size')
+                    
+                    header = bytes('{message:<{width}}'.format(message=len(obj_bytes), width=HEADERSIZE), encoding='utf-8')
+                    s.sendall(header + obj_bytes)
+
+                    obj_recv = bytearray()
+                    data = s.recv(64)
+                    obj_length = int(data[:HEADERSIZE].decode('utf-8'))
+                    obj_recv.extend(data[HEADERSIZE:])
+                    while len(obj_recv) < obj_length:
+                        data = s.recv(64)
+                        obj_recv.extend(data)
+
+                    obj_recv = pickle.loads(obj_recv)
+                    print(obj_recv)#obj_recv ist später der Wert, der von Mentat berechnet wurde
+                except socket.error as e:
+                    print('exception!!!')
 
 
 class Startpage(tk.Frame):
@@ -100,14 +137,10 @@ class Startpage(tk.Frame):
         marcMentat_commands.pack(fill=tk.BOTH, expand=True)
         right_label = tk.Label(frame_random_shape_settings, text='\nwelcher Algorithmus,\nwie oft,\nvielleicht auch\nAnzahl formen pro Generation usw')
         right_label.pack()
+        test_shape = ttk.Button(frame_random_shape_settings, text='Beispielshape einlesen', command=self.master.master.test_exampleshape)
+        test_shape.pack()
         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
-
-    def get_mentat_commands(self):
-        #gibt eine Liste (einen Tuple) aus strings zurück
-        #jeder String wird als command an Mentat weitergegeben, nachdem die Form eingelesen 
-        #und Kräfte angetragen wurden
-        return self.mentat_commandlist.get_all_items()
 
     def draw_shape(self, shape, comparison_shape, autoscale):
         
@@ -230,7 +263,7 @@ class MarcMentatPage(tk.Frame):
         bottombox = tk.Frame(self)
         close = ttk.Button(bottombox, text="close", command=lambda: self.master.master.show_frame("startpage"))
         close.pack(side=tk.RIGHT, pady=4, padx=4)
-        test_all = ttk.Button(bottombox, text='test all', command=lambda: print('not supportet yet'))
+        test_all = ttk.Button(bottombox, text='test all', command=self.test_all)
         test_all.pack(side=tk.LEFT, pady=4, padx=4)
         bottombox.pack(side=tk.BOTTOM, fill=tk.X)
 
@@ -253,10 +286,52 @@ class MarcMentatPage(tk.Frame):
                 int(port)
                 self.listbox.insert(tk.END, 'HOST "{}", PORT {}'.format(host, port))
                 self.connections.append((host,int(port)))
-                self.entry_host.delete(0,'end')
+                #self.entry_host.delete(0,'end')
                 self.entry_port.delete(0,'end')
             except:
                 pass
+
+    def test_all(self):
+        i = 0
+        while i < len(self.connections):
+            HOST = self.connections[i][0]
+            PORT = self.connections[i][1]
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1)
+                try:
+                    s.connect((HOST, PORT))
+                    test_obj = 'Hello World!'
+                    obj_send = Test_connection(test_obj)
+                    obj_bytes = pickle.dumps(obj_send)
+
+                    if len(str(len(obj_bytes)))>HEADERSIZE:
+                        raise Exception('Length of the object to send exceeds header size')
+                    
+                    header = bytes('{message:<{width}}'.format(message=len(obj_bytes), width=HEADERSIZE), encoding='utf-8')
+                    s.sendall(header + obj_bytes)
+
+                    obj_recv = bytearray()
+                    data = s.recv(64)
+                    obj_length = int(data[:HEADERSIZE].decode('utf-8'))
+                    obj_recv.extend(data[HEADERSIZE:])
+                    while len(obj_recv) < obj_length:
+                        data = s.recv(64)
+                        obj_recv.extend(data)
+
+                    obj_recv = pickle.loads(obj_recv)
+                    if test_obj==obj_recv:
+                        i += 1
+                    else:
+                        self.remove_connection(i)
+                except socket.error as e:
+                    self.remove_connection(i)
+
+    def remove_connection(self, index):
+        self.connections.pop(index)
+        self.listbox.delete(index)
+
+    def get_connections(self):
+        return self.connections.copy()
 
 class Mentat_commandlist(tk.Frame):
     def __init__(self, master):
