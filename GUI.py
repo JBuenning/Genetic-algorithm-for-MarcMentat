@@ -394,11 +394,11 @@ class Mentat_commandlist(tk.Frame):
             self.curIndex = i
 gui = GUI()
 #example = examples.get_cool_example()
-#example2 = examples.get_cool_example()
 #gui.draw_shape(example, comparison_shape=example, autoscale=True)
+#example2 = examples.get_cool_example()
 #for i in range(1000):
-#    example2 = shape.change_shape_one(example2)
 #    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+#    example2 = shape.change_shape_one(example2)
 #    time.sleep(0)
 #print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
 gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))

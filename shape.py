@@ -20,6 +20,17 @@ def get_lines(shape):
     lines.append([coords[len(coords)-1],coords[0]])
     return lines
 
+def shortest_line(shape,data_type):#data_type - l gibt line zurück, v den wert
+    lines = get_lines(shape)
+    shortest_line = None
+    for line in lines:
+        if  shortest_line == None or get_distance(line[0],line[1])<shortest_line:
+            if data_type == 'v':
+                shortest_line = get_distance(line[0],line[1])
+            elif data_type == 'l':
+                shortest_line = line
+    return shortest_line
+        
 def line_intersection(line1, line2): 
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0]) 
     ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1]) #Typo was here 
@@ -203,66 +214,73 @@ def even_out_shape(shape, n_times=1):
         return shape
     else:
         return even_out_shape(shape, n_times - 1)
-    
-#ähnlicher Algorithmus wie change_shape_one. Der Unterschied ist, das dieser Algorithmus die Tendenz hat, dünne Strukturen zu vermeiden.
-#Daher wird die Fläche der Form tendentiell größer
-#zusätzlich: round shape, wenn eine bestimmte reursion depth erreicht ist
-def change_shape_three(shape, min_movement=0.1, max_movement=1, max_recursiondepth=4, endless_loop_counter=0):
-    def move_point(point, neighbour1, neighbour2, movement, restriction):#ist die gleiche Funktion wie bei change_shape_one
-        #Hilfsfuntion für change_shape
-        n1x, n1y = neighbour1
-        n2x, n2y = neighbour2
+
+def change_shape_two(shape, min_movement=0.1, max_movement=1):
+    def move_point(point, start, end, movement, restriction):
+        sx, sy = start
+        ex, ey = end
         px, py = point
         if restriction:
             if type(restriction) is tuple:
                 movement_x, movement_y = restriction
             else:
-                return point
+                pass
         else:
-            movement_x = n2y - n1y
-            movement_y = n1x - n2x
+            movement_x = ey - sy
+            movement_y = sx - ex
 
-        movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(n2x-n1x, 2) + math.pow(n2y-n1y, 2)))
+        movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(ex-sx, 2) + math.pow(ey-sy, 2)))
 
         x = px + movement*movement_x
         y = py + movement*movement_y
         return (x,y)
 
-    coords = shape.exterior.coords[:-1]
-    random_selection = []
-    for i in range(len(coords)):
-        if (not shape.move_restrictions[i]) or (type(shape.move_restrictions[i]) is tuple):
-            random_selection.append(i)
-    choice = random.choice(random_selection)
-    if choice == len(coords)-1:
-        n2 = 0
-    else:
-        n2 = choice+1
-    n1 = choice - 1
-
-    movement = random.uniform(min_movement, max_movement)
-    movement = movement * random.choice([1, -1])
-    coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
-    s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    s = even_out_shape(s, 3)
-    while (not s.is_valid) or (not s.is_simple):
-        
-        if movement <= min_movement:
-            if endless_loop_counter >= max_recursiondepth:
-                print('round shape')
-                return change_shape_three(round_shape(shape), min_movement, max_movement, max_recursiondepth, 0)
-            else:
-
-                print('das sollte besser nicht zu oft hintereinander zu sehen sein')
-                return change_shape_three(shape, min_movement, max_movement, max_recursiondepth, endless_loop_counter+1)
+    def linear_function(shape,coords_change):
+        ### Lineare Funktion ###
+        coords = shape.exterior.coords[:-1]
+        start_coord = coords_change[0]
+        end_coord = coords_change[len(coords_change)-1]
+        in_or_out = random.choice([-1,1])
+        if (len(coords_change) % 2) != 0:
+            r=0
+            start_len = end_len = int(len(coords_change)/2)+1
         else:
-            coords = shape.exterior.coords[:-1]
-            movement = movement/2
-            coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
-            s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-            s = even_out_shape(s, 3)
-    return s
+            r = random.randint(0,1)
+            if bool(r):
+                start_len = int(len(coords_change)/2)
+                end_len = int(len(coords_change)/2)+1
+            else:
+                start_len = int(len(coords_change)/2)+1
+                end_len = int(len(coords_change)/2)
+        #mid_coord = coords_change[int((len(coords_change)/2))-r]
+        for i in range(start_len):
+            coords[coords.index(coords_change[i])] = move_point(coords_change[i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+        for i in range(end_len-1):
+            coords[coords.index(coords_change[len(coords_change)-1-i])] = move_point(coords_change[len(coords_change)-1-i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+        return Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
 
+    ### Zu ändernde Koordinaten werden bestimmt ###
+    coords = shape.exterior.coords[:-1]
+    coords_free = []
+    coords_change = []
+    min_num_changed_coords = 1
+    for i, coord in enumerate(coords):
+        if shape.move_restrictions[i] == False: #später anpassen auf teilweise eingeschränkte Punkte
+            coords_free.append(coord)
+    start = random.randint(0,int(len(coords_free)/2))#int(len(coords2)/2) nur zum ausprobieren kann auch anders gewählt werden
+    for i in range(start,random.randint(start+min_num_changed_coords+2,len(coords_free)-1)):#len(coords_free)-1 eventuell stärker eingrenzen
+        coords_change.append(coords_free[i])
+    
+    ### Umformung ###
+    s = linear_function(shape,coords_change)
+
+    ### Kontrollen ###
+    while not(s.is_valid) or not(s.is_simple) or not(s.is_thick()):
+        s = change_shape_two(shape)
+
+    ### Glätten ###
+    s = even_out_shape(s, 3)
+    return s
 
 #zufällige Form
 #max_movement - in prozent bezogen auf abstand beider nachbarpunkte zueinander
@@ -362,7 +380,14 @@ class Shape(geometry.Polygon):
             self.forces = [(False,False)]*len(shell)
         else:
             self.forces=forces
-            
+
+    def is_thick(self,factor=1):   
+        limit = shortest_line(self,'v')*factor
+        for point in self.exterior.coords[:-1]:
+            if smallest_distance_point_shape(point,self,True)[0] < limit:
+                return False
+        return True
+        
         
         #einige Methoden und Attribute, die schon da sind:
             
