@@ -16,6 +16,7 @@ class GUI(tk.Tk):
 
     def __init__(self):
         super().__init__()
+        self.core = core.Core()
         #self.minsize(width=500, height=300)
         self.title("Genetic MarcMentat")
 
@@ -27,7 +28,7 @@ class GUI(tk.Tk):
 
         #alle Frames, die auf dem Backroundframe liegen
         self.pages = {}
-        self.pages["marcMentat"] = MarcMentatPage(backroundframe)
+        self.pages["marcMentat"] = MarcMentatPage(backroundframe, self.core)
         self.pages["marcMentat"].grid(row=0, column=0, sticky="nsew")
         self.pages["startpage"] = Startpage(backroundframe)
         self.pages["startpage"].grid(row=0, column=0, sticky="nsew")
@@ -251,10 +252,9 @@ class Mergingpage(tk.Frame):
 
 class MarcMentatPage(tk.Frame):
 
-    def __init__(self, parent):
+    def __init__(self, parent, core):
         super().__init__(parent)
-
-        self.connections = []
+        self.core = core
 
         self.listbox = tk.Listbox(self)
         #label = tk.Label(topbox, text="hier kann man später die Marcs verbinden")
@@ -288,7 +288,7 @@ class MarcMentatPage(tk.Frame):
             try:
                 int(port)
                 self.listbox.insert(tk.END, 'HOST "{}", PORT {}'.format(host, port))
-                self.connections.append((host,int(port)))
+                self.core.mentat_connections.append((host,int(port)))
                 #self.entry_host.delete(0,'end')
                 self.entry_port.delete(0,'end')
             except:
@@ -296,9 +296,9 @@ class MarcMentatPage(tk.Frame):
 
     def test_all(self):
         i = 0
-        while i < len(self.connections):
-            HOST = self.connections[i][0]
-            PORT = self.connections[i][1]
+        while i < len(self.core.mentat_connections):
+            HOST = self.core.mentat_connections[i][0]
+            PORT = self.core.mentat_connections[i][1]
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 s.settimeout(1)
                 try:
@@ -330,11 +330,11 @@ class MarcMentatPage(tk.Frame):
                     self.remove_connection(i)
 
     def remove_connection(self, index):
-        self.connections.pop(index)
+        self.core.mentat_connections.pop(index)
         self.listbox.delete(index)
 
-    def get_connections(self):
-        return self.connections.copy()
+    #def get_connections(self):
+        #return self.connections.copy()
 
 class Mentat_commandlist(tk.Frame):
     def __init__(self, master):
@@ -396,13 +396,13 @@ class Mentat_commandlist(tk.Frame):
             self.listbox.insert(i-1, x)
             self.curIndex = i
 gui = GUI()
-c = core.Core()
-c.inital_shape = examples.get_realisticreate_example_polygonc_example()
-c.generate_first_generation()
-gen = c.generations[0]
-for shp in gen:
-    gui.draw_shape(shp, comparison_shape=c.inital_shape, autoscale=True)
-    time.sleep(0)
+# c = core.Core()
+# c.inital_shape = examples.get_realisticreate_example_polygonc_example()
+# c.generate_first_generation()
+# gen = c.generations[0]
+# for shp in gen:
+#     gui.draw_shape(shp, comparison_shape=c.inital_shape, autoscale=True)
+#     time.sleep(0)
 # gui.draw_shape(example, comparison_shape=example, autoscale=True)
 # example2 = examples.get_cool_example()
 # mutation_algorithm = mutation_algorithms.AlgorithmOne()

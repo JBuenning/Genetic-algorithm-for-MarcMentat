@@ -7,6 +7,9 @@ from tkinter import messagebox
 
 
 class Core:
+    '''
+    sdljflsdjflkjdsflkjdslkfj
+    '''
     def __init__(self):
         self.generations = [] #list with all generations, generation[0] is the inital generation
         self.inital_shape = None #Shape that the user wants to improve
