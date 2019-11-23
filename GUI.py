@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import matplotlib
+import core
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import shape
 import examples
@@ -9,6 +10,7 @@ from mentat_connection import HEADERSIZE, Task, Test_connection
 import socket
 import pickle
 from algorithms import mutation_algorithms
+
 
 class GUI(tk.Tk):
 
@@ -394,14 +396,20 @@ class Mentat_commandlist(tk.Frame):
             self.listbox.insert(i-1, x)
             self.curIndex = i
 gui = GUI()
-example = examples.get_cool_example()
-gui.draw_shape(example, comparison_shape=example, autoscale=True)
-example2 = examples.get_cool_example()
-mutation_algorithm = mutation_algorithms.AlgorithmOne()
-for i in range(1000):
-    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
-    example2 = mutation_algorithm.change_shape(example2)
+c = core.Core()
+c.inital_shape = examples.get_realisticreate_example_polygonc_example()
+c.generate_first_generation()
+gen = c.generations[0]
+for shp in gen:
+    gui.draw_shape(shp, comparison_shape=c.inital_shape, autoscale=True)
     time.sleep(0)
+# gui.draw_shape(example, comparison_shape=example, autoscale=True)
+# example2 = examples.get_cool_example()
+# mutation_algorithm = mutation_algorithms.AlgorithmOne()
+# for i in range(1000):
+#     gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+#     example2 = mutation_algorithm.change_shape(example2)
+#     time.sleep(0)
 #print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
 #gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
 gui.mainloop()
