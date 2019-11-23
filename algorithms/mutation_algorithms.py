@@ -24,7 +24,6 @@ class MutationAlgorithm:
         frame = tkinter.Frame(master)
         label = tkinter.Label(frame, text='no settings available')
         label.pack()
-        frame.pack()
         return frame
 
     def get_name(self):
@@ -94,7 +93,7 @@ class AlgorithmOne(MutationAlgorithm):
                     #s_neg =round_shape(s_neg, 1)
             return random.choice([s, s_neg])
         
-        for i in range(self.n_times):
+        for _ in range(self.n_times):
             shp = help(shp)
         
         return shp

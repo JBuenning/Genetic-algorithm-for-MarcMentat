@@ -23,8 +23,6 @@ class GUI(tk.Tk):
         #Backroundframe, der allen Platz des Fensters einnimmt und auf den alles gezeichnet wird
         backroundframe = tk.Frame(self)
         backroundframe.pack(fill=tk.BOTH, expand=True)
-        backroundframe.grid_rowconfigure(0, weight=1)
-        backroundframe.grid_columnconfigure(0, weight=1)
 
         #alle Frames, die auf dem Backroundframe liegen
         self.pages = {}
