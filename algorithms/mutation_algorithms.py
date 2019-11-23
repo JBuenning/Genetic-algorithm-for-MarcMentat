@@ -2,10 +2,17 @@ import shape
 import tkinter
 import random
 
-class Algorithm:
+def get_all_mutation_algorithms():
+    array = []
+    one = AlgorithmOne()
+    array.append(one)
+    return array
+
+class MutationAlgorithm:
     def __init__(self):
         self.name = self.get_name()
         self.default_settings()
+        self.activated = True
     
     def change_shape(self, shape):
         raise NotImplementedError
@@ -26,7 +33,7 @@ class Algorithm:
     def get_description(self):
         return 'no descriptin available'
 
-class AlgorithmOne(Algorithm):
+class AlgorithmOne(MutationAlgorithm):
 #zufällige Form
 #max_movement - in prozent bezogen auf abstand beider nachbarpunkte zueinander
 #min_movement - siehe max

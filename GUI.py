@@ -8,7 +8,7 @@ import time
 from mentat_connection import HEADERSIZE, Task, Test_connection
 import socket
 import pickle
-import algorithm
+from algorithms import mutation_algorithms
 
 class GUI(tk.Tk):
 
@@ -397,10 +397,10 @@ gui = GUI()
 example = examples.get_cool_example()
 gui.draw_shape(example, comparison_shape=example, autoscale=True)
 example2 = examples.get_cool_example()
-algorithm = algorithm.AlgorithmOne()
+mutation_algorithm = mutation_algorithms.AlgorithmOne()
 for i in range(1000):
     gui.draw_shape(example2, comparison_shape=example, autoscale=True)
-    example2 = algorithm.change_shape(example2)
+    example2 = mutation_algorithm.change_shape(example2)
     time.sleep(0)
 #print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
 #gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
