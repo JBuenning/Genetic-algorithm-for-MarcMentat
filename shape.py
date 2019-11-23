@@ -5,6 +5,25 @@ import random
 import math
 import examples
 
+def move_point(point, start, end, movement, restriction):
+        sx, sy = start
+        ex, ey = end
+        px, py = point
+        if restriction:
+            if type(restriction) is tuple:
+                movement_x, movement_y = restriction
+            else:
+                pass
+        else:
+            movement_x = ey - sy
+            movement_y = sx - ex
+
+        movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(ex-sx, 2) + math.pow(ey-sy, 2)))
+
+        x = px + movement*movement_x
+        y = py + movement*movement_y
+        return (x,y)
+
 def get_distance(point1,point2):
     x1,y1 = point1
     x2,y2 = point2
@@ -282,79 +301,7 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     s = even_out_shape(s, 3)
     return s
 
-#zufällige Form
-#max_movement - in prozent bezogen auf abstand beider nachbarpunkte zueinander
-#min_movement - siehe max
-def change_shape_one(shape, min_movement=0.1, max_movement=1, max_recursiondepth=20, endless_loop_counter=0):
-    def move_point(point, neighbour1, neighbour2, movement, restriction):
-        #Hilfsfuntion für change_shape
-        n1x, n1y = neighbour1
-        n2x, n2y = neighbour2
-        px, py = point
-        if restriction:
-            if type(restriction) is tuple:
-                movement_x, movement_y = restriction
-            else:
-                return point
-        else:
-            movement_x = n2y - n1y
-            movement_y = n1x - n2x
 
-        movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(n2x-n1x, 2) + math.pow(n2y-n1y, 2)))
-
-        x = px + movement*movement_x
-        y = py + movement*movement_y
-        return (x,y)
-
-    #min und max movement beziehen sich auf die Distanz zwischen den Nachbarpunkten.
-    #ein movement von 1 würde bedeuten, dass der Punkt sich um die Länge der Entfernung der Nachbarpunkte zueinander bewegt
-    #erst mal nur für das Äußere
-    coords = shape.exterior.coords[:-1]
-    coords_neg = shape.exterior.coords[:-1]
-    random_selection = []
-    for i in range(len(coords)):
-        if (not shape.move_restrictions[i]) or (type(shape.move_restrictions[i]) is tuple):
-            random_selection.append(i)
-    choice = random.choice(random_selection)
-    if choice == len(coords)-1:
-        n2 = 0
-    else:
-        n2 = choice+1
-    n1 = choice - 1
-
-    movement = random.uniform(min_movement, max_movement)
-    movement_neg = movement * (-1)
-    coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
-    coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
-    s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    s = even_out_shape(s, 3)
-    #s = round_shape(s, 1)
-    s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-    s_neg = even_out_shape(s_neg, 3)
-    #s_neg =round_shape(s_neg, 1)
-    while (not s.is_valid) or (not s.is_simple) or (not s_neg.is_valid) or (not s_neg.is_simple):
-        if movement <= min_movement:
-            if endless_loop_counter >= max_recursiondepth:
-                print('round shape')
-                return change_shape_one(round_shape(shape), min_movement, max_movement, max_recursiondepth, 0)
-            else:
-                print('das sollte besser nicht zu oft hintereinander zu sehen sein')
-                return change_shape_one(shape, min_movement, max_movement, max_recursiondepth, endless_loop_counter+1)
-
-        else:
-            coords = shape.exterior.coords[:-1]
-            coords_neg = shape.exterior.coords[:-1]
-            movement = movement/2
-            movement_neg = movement_neg/2
-            coords[choice] = move_point(coords[choice], coords[n1], coords[n2], movement, shape.move_restrictions[choice])
-            coords_neg[choice] = move_point(coords_neg[choice], coords_neg[n1], coords_neg[n2], movement_neg, shape.move_restrictions[choice])
-            s = Shape(coords, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-            s = even_out_shape(s, 3)
-            #s = round_shape(s, 1)
-            s_neg = Shape(coords_neg, shape.interiors, shape.move_restrictions, shape.fixed_displacements, shape.forces)
-            s_neg = even_out_shape(s_neg, 3)
-            #s_neg =round_shape(s_neg, 1)
-    return random.choice([s, s_neg])
     
 #shell - Liste mit tuples (Koordinaten)
 #move_restrictions - gleiche länge wie shell

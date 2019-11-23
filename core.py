@@ -17,3 +17,4 @@ class Core:
         pass
     
     def get_random_shape(self,algorithm):
+        pass

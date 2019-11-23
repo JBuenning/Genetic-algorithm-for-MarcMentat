@@ -8,6 +8,7 @@ import time
 from mentat_connection import HEADERSIZE, Task, Test_connection
 import socket
 import pickle
+import algorithm
 
 class GUI(tk.Tk):
 
@@ -49,7 +50,7 @@ class GUI(tk.Tk):
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
-        self.show_frame("mergingpage")
+        self.show_frame("startpage")
 
     def draw_shape(self, shape, comparison_shape=None, autoscale=True):
         #zeichnet das Polygon
@@ -393,13 +394,14 @@ class Mentat_commandlist(tk.Frame):
             self.listbox.insert(i-1, x)
             self.curIndex = i
 gui = GUI()
-#example = examples.get_cool_example()
-#gui.draw_shape(example, comparison_shape=example, autoscale=True)
-#example2 = examples.get_cool_example()
-#for i in range(1000):
-#    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
-#    example2 = shape.change_shape_one(example2)
-#    time.sleep(0)
+example = examples.get_cool_example()
+gui.draw_shape(example, comparison_shape=example, autoscale=True)
+example2 = examples.get_cool_example()
+algorithm = algorithm.AlgorithmOne()
+for i in range(1000):
+    gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+    example2 = algorithm.change_shape(example2)
+    time.sleep(0)
 #print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
-gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
+#gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
 gui.mainloop()

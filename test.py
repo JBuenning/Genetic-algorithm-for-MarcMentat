@@ -1,6 +1,11 @@
-import shape
-import examples
+class Test:
+    def test_method(self,a):
+        print(a)
 
-ex = examples.create_example_polygon()
-coords = list(ex.exterior.coords[:-1])
-print(coords)
+class Tttest(Test):
+
+    def test_metho123d(self,a,b):
+        print(b)
+
+t = Tttest()
+t.test_method('Hallo')
