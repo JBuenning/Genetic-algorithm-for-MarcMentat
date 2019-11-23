@@ -76,7 +76,7 @@ def smallest_distance_point_shape(point,shape,point_in_shape):
             return [smallest_distance[0],True]#True - kürzeste Distanz liegt auf der Umrandung des Polygons
     return [smallest_distance[0],False]#False - kürzeste Distanz liegt nicht auf der Umrandung des Polygons
         
-def point_between_points(point1,point2,factor):#factor- 0.5 entspricht dem mittel
+def point_between_points(point1,point2,factor=0.5):#factor- 0.5 entspricht dem mittel - 0.4 oder 0.6 funktionieren noch nicht
     x1,y1 = point1
     x2,y2 = point2
     x = (x1+x2)*factor

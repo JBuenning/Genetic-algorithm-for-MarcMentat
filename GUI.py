@@ -49,7 +49,7 @@ class GUI(tk.Tk):
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
-        self.show_frame("startpage")
+        self.show_frame("mergingpage")
 
     def draw_shape(self, shape, comparison_shape=None, autoscale=True):
         #zeichnet das Polygon
@@ -403,6 +403,3 @@ gui = GUI()
 #print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
 gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
 gui.mainloop()
-##second_example = shape.even_out_shape(example, 1)
-##third_example = shape.even_out_shape(second_example)
-##gui.draw_shape(third_example, comparison_shape=second_example, autoscale=True)
