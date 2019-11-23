@@ -49,7 +49,7 @@ class GUI(tk.Tk):
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
-        self.show_frame("mergingpage")
+        self.show_frame("startpage")
 
     def draw_shape(self, shape, comparison_shape=None, autoscale=True):
         #zeichnet das Polygon
@@ -73,6 +73,37 @@ class GUI(tk.Tk):
 
     def save_as(self):
         print("save as")
+
+    def test_exampleshape(self):
+        for connection in self.get_mentat_connections():
+            HOST = connection[0]
+            PORT = connection[1]
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1)
+                try:
+                    s.connect((HOST, PORT))
+                    example_shape = examples.get_cool_example()
+                    obj_send = Task(list(example_shape.exterior.coords[:-1]), '','')#2. und 3. Argument muss natürlich noch gefüllt werden
+                    obj_bytes = pickle.dumps(obj_send)
+
+                    if len(str(len(obj_bytes)))>HEADERSIZE:
+                        raise Exception('Length of the object to send exceeds header size')
+                    
+                    header = bytes('{message:<{width}}'.format(message=len(obj_bytes), width=HEADERSIZE), encoding='utf-8')
+                    s.sendall(header + obj_bytes)
+
+                    obj_recv = bytearray()
+                    data = s.recv(64)
+                    obj_length = int(data[:HEADERSIZE].decode('utf-8'))
+                    obj_recv.extend(data[HEADERSIZE:])
+                    while len(obj_recv) < obj_length:
+                        data = s.recv(64)
+                        obj_recv.extend(data)
+
+                    obj_recv = pickle.loads(obj_recv)
+                    print(obj_recv)#obj_recv ist später der Wert, der von Mentat berechnet wurde
+                except socket.error as e:
+                    print('exception!!!')
 
 
 class Startpage(tk.Frame):
@@ -106,14 +137,10 @@ class Startpage(tk.Frame):
         marcMentat_commands.pack(fill=tk.BOTH, expand=True)
         right_label = tk.Label(frame_random_shape_settings, text='\nwelcher Algorithmus,\nwie oft,\nvielleicht auch\nAnzahl formen pro Generation usw')
         right_label.pack()
+        test_shape = ttk.Button(frame_random_shape_settings, text='Beispielshape einlesen', command=self.master.master.test_exampleshape)
+        test_shape.pack()
         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
-
-    def get_mentat_commands(self):
-        #gibt eine Liste (einen Tuple) aus strings zurück
-        #jeder String wird als command an Mentat weitergegeben, nachdem die Form eingelesen 
-        #und Kräfte angetragen wurden
-        return self.mentat_commandlist.get_all_items()
 
     def draw_shape(self, shape, comparison_shape, autoscale):
         
@@ -296,7 +323,6 @@ class MarcMentatPage(tk.Frame):
                         i += 1
                     else:
                         self.remove_connection(i)
-                #except (socket.timeout, socket.gaierror) as e:
                 except socket.error as e:
                     self.remove_connection(i)
 
