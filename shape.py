@@ -354,12 +354,12 @@ class Shape(geometry.Polygon):
             self.move_restrictions=move_restrictions
 
         if fixed_displacements is None:
-            self.fixed_displacements = [(False),(False)]*len(shell)
+            self.fixed_displacements = [(False,False)]*len(shell)
         else:
             self.fixed_displacements=fixed_displacements
 
         if forces is None:
-            self.forces = [(False),(False)]*len(shell)
+            self.forces = [(False,False)]*len(shell)
         else:
             self.forces=forces
             
