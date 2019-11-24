@@ -30,7 +30,7 @@ class GUI(tk.Tk):
         self.pages = {}
         self.pages["marcMentat"] = MarcMentatPage(backroundframe, self.core)
         self.pages["marcMentat"].grid(row=0, column=0, sticky="nsew")
-        self.pages["startpage"] = Startpage(backroundframe)
+        self.pages["startpage"] = Startpage(backroundframe, self.core)
         self.pages["startpage"].grid(row=0, column=0, sticky="nsew")
 
         #menubar
@@ -108,8 +108,9 @@ class GUI(tk.Tk):
 
 class Startpage(tk.PanedWindow):
 
-    def __init__(self, parent):
+    def __init__(self, parent, core):
         super().__init__(parent)
+        self.core = core
 
         #some help-widgets (not so important)
         leftpane = tk.PanedWindow(self, orient='vertical')
@@ -126,7 +127,7 @@ class Startpage(tk.PanedWindow):
         scroll_canvas.pack(side='top', fill='both', expand=True)
         
         #the basic layout
-        settings_box = tk.Frame(scroll_canvas, bg='red')
+        settings_box = tk.Frame(scroll_canvas)
         important_box = tk.Frame(rightbox)#box on the bottom right
         shape_box = tk.Frame(leftpane)
         plot_box = tk.Frame(leftpane)
@@ -162,23 +163,22 @@ class Startpage(tk.PanedWindow):
         toolbar.update()
         self.plot_canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
 
-#         rightbox = tk.Frame(self, bg='red')
-#         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
-
-#         frame_random_shape_settings = ttk.Labelframe(rightbox, text='irgendwelche Settings')
-#         frame_random_shape_settings.pack(fill=tk.BOTH, expand=True)
-#         marcMentat_commands = ttk.Labelframe(rightbox, text='MarcMentat commands')
-#         marcMentat_commands.pack(fill=tk.BOTH, expand=True)
-#         right_label = tk.Label(frame_random_shape_settings, text='\nwelcher Algorithmus,\nwie oft,\nvielleicht auch\nAnzahl formen pro Generation usw')
-#         right_label.pack()
-#         test_shape = ttk.Button(frame_random_shape_settings, text='Beispielshape einlesen', command=self.master.master.test_exampleshape)
-#         test_shape.pack()
+        #settings box
+        container_mutation_algorithms = ToggledFrameContainer(settings_box, 'mutation algorithm')
+        container_mutation_algorithms.pack(fill='x', pady=3)
+        for algo in self.core.mutation_algorithms:
+            ToggledFrameAlgorithm(container_mutation_algorithms.sub_frame, algo).pack(fill='x', pady=3)
+        #....
+        container_tests = ToggledFrameContainer(settings_box, 'tests')
+        container_tests.pack(fill='x', pady=3)
+        test_shape = ttk.Button(container_tests.sub_frame, text='Beispielshape einlesen', command=self.master.master.test_exampleshape)
+        test_shape.pack()
 #         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
 #         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
     
     def plot_graph(self, *args, **options):
-        '''works exactly like plt.plot()'''
-        
+        '''works exactly like matplotlib.pyplot.plot()'''
+
         self.plot.clear()
         self.plot.plot(*args, **options)
 
