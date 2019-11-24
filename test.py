@@ -69,22 +69,29 @@ class ToggledFrameContainer(tk.Frame):
             self.sub_frame.forget()
             self.toggle_button.configure(text='ᐅ')
 
-    def add_component(self, component):
-        self.sub_frame = component
-
-
 
 if __name__ == "__main__":
     root = tk.Tk()
 
-    headline = ToggledFrameContainer(root,'Überschrift')
-    headline.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+    headline = ToggledFrameContainer(root,'headline')
+    headline.pack(fill="x")
+
+    subheadline1 = ToggledFrameContainer(headline.sub_frame,'subheadline 1')
+    subheadline1.pack(fill="x")
+
+    subheadline2 = ToggledFrameContainer(headline.sub_frame,'subheadline 2')
+    subheadline2.pack(fill="x")
 
     algo = mutation_algorithms.AlgorithmOne()
-    t = ToggledFrameAlgorithm(headline,algo, borderwidth=1)
+    t = ToggledFrameAlgorithm(subheadline1.sub_frame,algo, borderwidth=1)
+    t.pack(fill='both')
+
+    algo2 = mutation_algorithms.AlgorithmOne()
+    t2 = ToggledFrameAlgorithm(subheadline1.sub_frame,algo2, borderwidth=1)
+    t2.pack(fill='both')
     #t.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
 
-    headline.add_component(t)
+    #headline.add_component(t)
 
     # t2 = ToggledFrameAlgorithm(t.sub_frame, text='Rotate', relief="raised", borderwidth=1)
     # t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
