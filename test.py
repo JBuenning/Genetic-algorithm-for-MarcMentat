@@ -1,113 +1,67 @@
 import tkinter as tk
-from tkinter import ttk
-from algorithms import mutation_algorithms
 
+class GUI(tk.Tk):
 
-class ToggledFrameAlgorithm(tk.Frame):
+    def __init__(self):
+        super().__init__()
+        #self.core = core.Core()
+        #self.minsize(width=500, height=300)
+        self.title("Genetic MarcMentat")
 
-    def __init__(self, parent, algorithm, *args, **options):
-        super().__init__(parent, *args, **options)
+        #Backroundframe, der allen Platz des Fensters einnimmt und auf den alles gezeichnet wird
+        backroundframe = tk.Frame(self, bg='green')
+        backroundframe.pack(fill=tk.BOTH, expand=True)
+        backroundframe.columnconfigure(0, weight=1)
+        backroundframe.rowconfigure(0, weight=1)
 
-        self.algorithm = algorithm
-        self.show = tk.BooleanVar()
-        self.show.set(False)
+        #alle Frames, die auf dem Backroundframe liegen
+        self.pages = {}
+        #self.pages["marcMentat"] = MarcMentatPage(backroundframe, self.core)
+        #self.pages["marcMentat"].grid(row=0, column=0, sticky="nsew")
+        self.pages["startpage"] = Startpage(backroundframe)
+        self.pages["startpage"].grid(row=0, column=0, sticky="nsew")
 
-        self.status = tk.BooleanVar()
-        self.status.set(True)
+        #menubar
+        menu = tk.Menu(self)
+        self.config(menu=menu)
 
-        self.title_frame = tk.Frame(self)
-        self.title_frame.pack(fill="x", expand=1)
+        #file-dropdown
+        file_dropdown = tk.Menu()
+        file_dropdown.add_command(label="Open", command=self.open_file)
+        file_dropdown.add_command(label="Save as", command=self.save_as)
+        file_dropdown.master = menu
+        menu.add_cascade(menu=file_dropdown, label="File")
 
-        self.toggle_button = ttk.Checkbutton(self.title_frame, width=2, text='ᐅ', command=self.toggle,
-                                            variable=self.show, style='Toolbutton')
-        self.toggle_button.pack(side="left")
+        #settings
+        settings = tk.Menu()
+        settings.add_command(label="marcMentat", command=lambda: self.show_frame("marcMentat"))
+        settings.master = menu
+        menu.add_cascade(menu=settings, label="Settings")
 
-        self.label = tk.Label(self.title_frame, text = self.algorithm.get_name())
-        self.label.pack(side='left')
+        self.show_frame("startpage")
 
-        self.checkbox = ttk.Checkbutton(self.title_frame,command= self.cb, variable = self.status)
-        self.checkbox.pack(side="right", expand=0)
+    def show_frame(self, name):
+        #wechselt zwischen den Frames, die den ganzen Platz im Fenster einnehmen
+        self.pages[name].tkraise()
 
-        self.sub_frame = self.algorithm.get_settings_frame(self)
+    def open_file(self):
+        filename = tk.filedialog.askopenfilename(filetypes=(("All Files", "*.*"), ("Shape", "*.shape")))#nur ein Beispiel
+        if len(filename) != 0:
+            print(filename)
 
-    def cb(self):
-        self.algorithm.activated = self.status.get()
+    def save_as(self):
+        print("save as")
+class Startpage(tk.PanedWindow):
 
-    def toggle(self):
-        if self.show.get():
-            self.sub_frame.pack(fill="x", expand=1)
-            self.toggle_button.configure(text='ᐁ')
-        else:
-            self.sub_frame.forget()
-            self.toggle_button.configure(text='ᐅ')
+    def __init__(self, parent):
+        super().__init__(parent)
 
-class ToggledFrameContainer(tk.Frame):
+        leftbox = tk.Frame(self, bg='yellow')
+        self.add(leftbox)
+        label = tk.Label(leftbox, text='sldkfj')
+        label.pack()
+        rightbox = tk.Frame(self, bg='red')
+        self.add(rightbox)
 
-    def __init__(self, parent, name, *args, **options):
-        super().__init__(parent, *args, **options)
-
-        self.show = tk.BooleanVar()
-        self.show.set(False)
-
-        self.title_frame = tk.Frame(self)
-        self.title_frame.pack(fill="x", expand=1)
-
-        self.toggle_button = ttk.Checkbutton(self.title_frame, width=2, text='ᐅ', command=self.toggle,
-                                            variable=self.show, style='Toolbutton')
-        self.toggle_button.pack(side="left")
-
-        self.label = ttk.Label(self.title_frame, text = name)
-        self.label.pack(side='left')
-
-        self.sub_frame = tk.Frame(self)
-
-    def toggle(self):
-        if self.show.get():
-            self.sub_frame.pack(fill="x", expand=1, padx=(15,0))
-            self.toggle_button.configure(text='ᐁ')
-        else:
-            self.sub_frame.forget()
-            self.toggle_button.configure(text='ᐅ')
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-
-    headline = ToggledFrameContainer(root,'headline')
-    headline.pack(fill="x")
-
-    subheadline1 = ToggledFrameContainer(headline.sub_frame,'subheadline 1')
-    subheadline1.pack(fill="x")
-
-    subheadline2 = ToggledFrameContainer(headline.sub_frame,'subheadline 2')
-    subheadline2.pack(fill="x")
-
-    algo = mutation_algorithms.AlgorithmOne()
-    t = ToggledFrameAlgorithm(subheadline1.sub_frame,algo, borderwidth=1)
-    t.pack(fill='both')
-
-    algo2 = mutation_algorithms.AlgorithmOne()
-    t2 = ToggledFrameAlgorithm(subheadline1.sub_frame,algo2, borderwidth=1)
-    t2.pack(fill='both')
-    #t.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
-
-    #headline.add_component(t)
-
-    # t2 = ToggledFrameAlgorithm(t.sub_frame, text='Rotate', relief="raised", borderwidth=1)
-    # t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
-    # ttk.Label(t2.sub_frame, text='Rotation [deg]:').pack(side="left", fill="x", expand=1)
-    # ttk.Entry(t2.sub_frame).pack(side="left")
-
-    # t2 = ToggledFrame(root, text='Resize', relief="raised", borderwidth=1)
-    # t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
-
-    # for i in range(10):
-    #     ttk.Label(t2.sub_frame, text='Test' + str(i)).pack()
-
-    # t3 = ToggledFrame(root, text='Fooo', relief="raised", borderwidth=1)
-    # t3.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
-
-    # for i in range(10):
-    #     ttk.Label(t3.sub_frame, text='Bar' + str(i)).pack()
-
-    root.mainloop()
+root = GUI()
+root.mainloop()

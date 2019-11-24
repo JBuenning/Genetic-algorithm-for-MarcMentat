@@ -23,6 +23,8 @@ class GUI(tk.Tk):
         #Backroundframe, der allen Platz des Fensters einnimmt und auf den alles gezeichnet wird
         backroundframe = tk.Frame(self)
         backroundframe.pack(fill=tk.BOTH, expand=True)
+        backroundframe.columnconfigure(0, weight=1)
+        backroundframe.rowconfigure(0, weight=1)
 
         #alle Frames, die auf dem Backroundframe liegen
         self.pages = {}
@@ -44,7 +46,6 @@ class GUI(tk.Tk):
 
         #settings
         settings = tk.Menu()
-        settings.add_command(label="marcMentat", command=lambda: self.show_frame("marcMentat"))
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
@@ -105,41 +106,76 @@ class GUI(tk.Tk):
                     print('exception!!!')
 
 
-class Startpage(tk.Frame):
+class Startpage(tk.PanedWindow):
 
     def __init__(self, parent):
         super().__init__(parent)
 
-        topbox = tk.Frame(self)
-        topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        f = matplotlib.figure.Figure()
-        self.plot = f.add_subplot(111)
-        self.plot.set_aspect('equal', adjustable='datalim')#x- und y- achse gleich skaliert
+        leftpane = tk.PanedWindow(self, orient='vertical')
+        self.add(leftpane)
+        rightbox = tk.Frame(self)
+        self.add(rightbox)
+        scrollbox = tk.Frame(rightbox)
+        scrollbox.pack(side='top', fill='both', expand=True)
+        scrolly = tk.Scrollbar(scrollbox, orient='vertical')
+        scrollx = tk.Scrollbar(scrollbox, orient='horizontal')
+        scrolly.pack(side='right', fill='y')
+        scrollx.pack(side='bottom', fill='x')
+        scroll_canvas = tk.Canvas(scrollbox, yscrollcommand = scrolly.set, xscrollcommand = scrollx.set)
+        scroll_canvas.pack(side='top', fill='both', expand=True)
         
-        #um die Zahlen an den Achsen unsichtbar zu machen
-##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+
+        #the different boxes
+        settings_box = tk.Frame(scroll_canvas, bg='red')
+        important_box = tk.Frame(rightbox)#box on the bottom right
+        shape_box = tk.Frame(leftpane, bg='green')
+        plot_box = tk.Frame(leftpane, bg='blue')
+
+        settings_box.pack(side='top', fill='both', expand=True)
+        important_box.pack(side='bottom', fill='x')
+        leftpane.add(shape_box)
+        leftpane.add(plot_box)
+
+        mentat_button = ttk.Button(important_box, text='MarcMentat instances', command=lambda: parent.master.show_frame('marcMentat'))
+        mentat_button.pack(side='right', padx=4, pady=4)
+
+        #scrolly.config(command=settings_box.yview)
+        #scrollx.config(command=settings_box.xview)
         
-        self.canvas = FigureCanvasTkAgg(f, topbox)
-        self.canvas.draw()
-        toolbar = NavigationToolbar2Tk(self.canvas, topbox)
-        toolbar.update()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        
 
-        rightbox = tk.Frame(self, bg='red')
-        rightbox.pack(side=tk.RIGHT, fill=tk.Y)
+#         topbox = tk.Frame(self)
+#         topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        frame_random_shape_settings = ttk.Labelframe(rightbox, text='irgendwelche Settings')
-        frame_random_shape_settings.pack(fill=tk.BOTH, expand=True)
-        marcMentat_commands = ttk.Labelframe(rightbox, text='MarcMentat commands')
-        marcMentat_commands.pack(fill=tk.BOTH, expand=True)
-        right_label = tk.Label(frame_random_shape_settings, text='\nwelcher Algorithmus,\nwie oft,\nvielleicht auch\nAnzahl formen pro Generation usw')
-        right_label.pack()
-        test_shape = ttk.Button(frame_random_shape_settings, text='Beispielshape einlesen', command=self.master.master.test_exampleshape)
-        test_shape.pack()
-        self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
-        self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
+#         f = matplotlib.figure.Figure()
+#         self.plot = f.add_subplot(111)
+#         self.plot.set_aspect('equal', adjustable='datalim')#x- und y- achse gleich skaliert
+        
+#         #um die Zahlen an den Achsen unsichtbar zu machen
+# ##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+# ##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+        
+#         self.canvas = FigureCanvasTkAgg(f, topbox)
+#         self.canvas.draw()
+#         toolbar = NavigationToolbar2Tk(self.canvas, topbox)
+#         toolbar.update()
+#         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+#         rightbox = tk.Frame(self, bg='red')
+#         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
+
+#         frame_random_shape_settings = ttk.Labelframe(rightbox, text='irgendwelche Settings')
+#         frame_random_shape_settings.pack(fill=tk.BOTH, expand=True)
+#         marcMentat_commands = ttk.Labelframe(rightbox, text='MarcMentat commands')
+#         marcMentat_commands.pack(fill=tk.BOTH, expand=True)
+#         right_label = tk.Label(frame_random_shape_settings, text='\nwelcher Algorithmus,\nwie oft,\nvielleicht auch\nAnzahl formen pro Generation usw')
+#         right_label.pack()
+#         test_shape = ttk.Button(frame_random_shape_settings, text='Beispielshape einlesen', command=self.master.master.test_exampleshape)
+#         test_shape.pack()
+#         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
+#         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
+    
+
     def draw_shape_background(self,shp,markers=False,color='red'):
         self.plot.plot(*shp.exterior.xy, color=color)
         if markers:
@@ -191,7 +227,7 @@ class Startpage(tk.Frame):
             self.draw_shape_background(merged_shape,markers=True)
         self.draw_shape_foreground(shp1,fill_color='yellow')
         self.draw_shape_foreground(shp2,fill_color='green')
-        self.canvas.draw()  
+        self.canvas.draw()
   
 class MarcMentatPage(tk.Frame):
 
@@ -427,12 +463,12 @@ class ToggledFrameContainer(tk.Frame):
 
 
 gui = GUI()
-gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
-gui.core.generate_first_generation()
-gen = gui.core.generations[0]
-merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
-# gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
-gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)
+#gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
+# gui.core.generate_first_generation()
+# gen = gui.core.generations[0]
+# merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
+# # gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
+# gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)
 # for shp in gen:
 #gui.draw_shape(c.generations[0][0], comparison_shape=c.inital_shape, autoscale=True)
 #     time.sleep(0)
