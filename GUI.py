@@ -129,7 +129,7 @@ class Startpage(tk.PanedWindow):
         settings_box = tk.Frame(scroll_canvas, bg='red')
         important_box = tk.Frame(rightbox)#box on the bottom right
         shape_box = tk.Frame(leftpane)
-        plot_box = tk.Frame(leftpane, bg='blue')
+        plot_box = tk.Frame(leftpane)
 
         settings_box.pack(side='top', fill='both', expand=True)
         important_box.pack(side='bottom', fill='x')
@@ -144,16 +144,23 @@ class Startpage(tk.PanedWindow):
         f = matplotlib.figure.Figure()
         self.shape_plot = f.add_subplot(111)
         self.shape_plot.set_aspect('equal', adjustable='datalim')#scale of x- and y- axis equal
-        
-        #um die Zahlen an den Achsen unsichtbar zu machen
+        #to hide numbers and ticks of the axes
         #self.shape_plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
         #self.shape_plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-        
         self.shape_canvas = FigureCanvasTkAgg(f, shape_box)
         self.shape_canvas.draw()
         toolbar = NavigationToolbar2Tk(self.shape_canvas, shape_box)
         toolbar.update()
         self.shape_canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
+
+        #plot box
+        f = matplotlib.figure.Figure()
+        self.plot = f.add_subplot(111)
+        self.plot_canvas = FigureCanvasTkAgg(f, plot_box)
+        self.plot_canvas.draw()
+        toolbar = NavigationToolbar2Tk(self.plot_canvas, plot_box)
+        toolbar.update()
+        self.plot_canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
 
 #         rightbox = tk.Frame(self, bg='red')
 #         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
@@ -169,6 +176,11 @@ class Startpage(tk.PanedWindow):
 #         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
 #         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
     
+    def plot_graph(self, *args, **options):
+        '''works exactly like plt.plot()'''
+        
+        self.plot.clear()
+        self.plot.plot(*args, **options)
 
     def draw_shape_background(self,shp,markers=False,color='red'):
         self.shape_plot.plot(*shp.exterior.xy, color=color)
