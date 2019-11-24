@@ -22,9 +22,14 @@ class Core:
     def generate_first_generation(self): #fills the first array of self.generations with random shapes
         self.generations = []
         generation = []
+        activated_mutation_algorithms = []
+        for algorithm in self.mutation_algorithms:
+            if algorithm.activated:
+                activated_mutation_algorithms.append(algorithm)
+
         if not self.inital_shape:
             messagebox.showerror('error', 'no initial shape')
-        elif not self.mutation_algorithms:
+        elif not activated_mutation_algorithms:
             messagebox.showerror('error', 'no mutation algorithm selected')
         else:
             for _ in range(self.first_generation_size):
