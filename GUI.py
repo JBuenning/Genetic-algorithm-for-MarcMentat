@@ -30,8 +30,6 @@ class GUI(tk.Tk):
         self.pages["marcMentat"].grid(row=0, column=0, sticky="nsew")
         self.pages["startpage"] = Startpage(backroundframe)
         self.pages["startpage"].grid(row=0, column=0, sticky="nsew")
-        self.pages["mergingpage"] = Mergingpage(backroundframe)
-        self.pages["mergingpage"].grid(row=0, column=0, sticky="nsew")
 
         #menubar
         menu = tk.Menu(self)
@@ -47,19 +45,18 @@ class GUI(tk.Tk):
         #settings
         settings = tk.Menu()
         settings.add_command(label="marcMentat", command=lambda: self.show_frame("marcMentat"))
-        settings.add_command(label="mergingpage", command=lambda: self.show_frame("mergingpage"))
         settings.master = menu
         menu.add_cascade(menu=settings, label="Settings")
 
         self.show_frame("startpage")
 
-    def draw_shape(self, shape, comparison_shape=None, autoscale=True):
-        #zeichnet das Polygon
-        self.pages["startpage"].draw_shape(shape, comparison_shape, autoscale)
+    # def draw_shape(self, shape, comparison_shape=None, autoscale=True):
+    #     #zeichnet das Polygon
+    #     self.pages["startpage"].draw_shape(shape, comparison_shape, autoscale)
     
-    def draw_shape_merge(self, shape1,shape2, comparison_shape=None, autoscale=True):
-        #zeichnet das Polygon
-        self.pages["mergingpage"].draw_shapes(shape1,shape2, comparison_shape, autoscale)
+    # def draw_shape_merge(self, shape1,shape2, comparison_shape=None, autoscale=True):
+    #     #zeichnet das Polygon
+    #     self.pages["mergingpage"].draw_shapes(shape1,shape2, comparison_shape, autoscale)
 
     def get_mentat_connections(self):
         return self.pages['marcMentat'].get_connections()
@@ -143,12 +140,14 @@ class Startpage(tk.Frame):
         test_shape.pack()
         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
-    def draw_shape_background(self,shp,color='red'):
+    def draw_shape_background(self,shp,markers=False,color='red'):
         self.plot.plot(*shp.exterior.xy, color=color)
+        if markers:
+            self.plot.scatter(*shp.exterior.xy,color=color)
         for interior in shp.interiors:
             self.plot.plot(*interior.xy, color=color)
-    def draw_shape_foreground(self,shp):
-        self.plot.fill(*shp.exterior.xy, color='black', alpha=0.1)
+    def draw_shape_foreground(self,shp,fill_color='black'):
+        self.plot.fill(*shp.exterior.xy, color=fill_color, alpha=0.1)
         self.plot.plot(*shp.exterior.xy, color='black')
         self.plot.scatter(*shp.exterior.xy, color=self.restrictions_to_markercolors(shp))
 
@@ -184,74 +183,16 @@ class Startpage(tk.Frame):
         self.draw_shape_foreground(shp)
 
         self.canvas.draw()
-        
 
-class Mergingpage(tk.Frame):
-
-    def __init__(self, parent):
-        super().__init__(parent)
-
-        topbox = tk.Frame(self)
-        topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        f = matplotlib.figure.Figure()
-        self.plot = f.add_subplot(111)
-        self.plot.set_aspect('equal', adjustable='datalim')#x- und y- achse gleich skaliert
-        
-        #um die Zahlen an den Achsen unsichtbar zu machen
-##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-        
-        self.canvas = FigureCanvasTkAgg(f, topbox)
-        self.canvas.draw()
-        toolbar = NavigationToolbar2Tk(self.canvas, topbox)
-        toolbar.update()
-        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-
-        rightbox = tk.Frame(self, bg='red')
-        right_label = tk.Label(rightbox, text='Platz für Knöpfe usw\nnatürlich nur ein\nvorläufiges Layout')
-        right_label.pack()
-        rightbox.pack(side=tk.RIGHT, fill=tk.Y)
-
-    def draw_shapes(self, shape1, shape2, merged_shape, autoscale):
-        
+    def draw_shape_pairing(self, shp1, shp2, merged_shape, autoscale):
         self.plot.clear()
-        self.plot.autoscale(autoscale)#funktioniert noch nicht
-
-        #um die Zahlen an den Achsen unsichtbar zu machen
-##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-        ### Merged_shape
+        self.plot.autoscale(autoscale)
         if merged_shape is not None:
-            self.plot.plot(*merged_shape.exterior.xy, color='red')
-            self.plot.scatter(*merged_shape.exterior.xy, color='red')
-            interiors = merged_shape.interiors
-            for interior in interiors:
-                self.plot.plot(*interior.xy, color='red')
-
-        ### Shape 1 and 2
-        for shape in [shape1,shape2]:
-            markercolors = []
-            for restriction in shape.move_restrictions:
-                if restriction:
-                    if type(restriction) is tuple:
-                        markercolors.append('yellow')
-                    else:
-                        markercolors.append('red')
-                else:
-                    markercolors.append('black')
-            markercolors.append(markercolors[0])
-            
-            self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
-            self.plot.plot(*shape.exterior.xy, color='black')
-            self.plot.scatter(*shape.exterior.xy, color=markercolors)
-
-            interiors = shape.interiors
-            for interior in interiors:
-                self.plot.fill(*interior.xy, color='white')
-                self.plot.plot(*interior.xy, marker = 'o', color='black')
-        self.canvas.draw()        
-
+            self.draw_shape_background(merged_shape,markers=True)
+        self.draw_shape_foreground(shp1,fill_color='yellow')
+        self.draw_shape_foreground(shp2,fill_color='green')
+        self.canvas.draw()  
+  
 class MarcMentatPage(tk.Frame):
 
     def __init__(self, parent, core):
@@ -468,12 +409,14 @@ class ToggledFrameContainer(tk.Frame):
         self.sub_frame = component
 
 gui = GUI()
-c = core.Core()
-c.inital_shape = examples.get_realisticreate_example_polygonc_example()
-c.generate_first_generation()
-gen = c.generations[0]
+gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
+gui.core.generate_first_generation()
+gen = gui.core.generations[0]
+merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
+# gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
+gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)
 # for shp in gen:
-gui.draw_shape(c.generations[0][0], comparison_shape=c.inital_shape, autoscale=True)
+#gui.draw_shape(c.generations[0][0], comparison_shape=c.inital_shape, autoscale=True)
 #     time.sleep(0)
 # gui.draw_shape(example, comparison_shape=example, autoscale=True)
 # example2 = examples.get_cool_example()
