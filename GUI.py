@@ -111,6 +111,7 @@ class Startpage(tk.PanedWindow):
     def __init__(self, parent):
         super().__init__(parent)
 
+        #some help-widgets (not so important)
         leftpane = tk.PanedWindow(self, orient='vertical')
         self.add(leftpane)
         rightbox = tk.Frame(self)
@@ -124,11 +125,10 @@ class Startpage(tk.PanedWindow):
         scroll_canvas = tk.Canvas(scrollbox, yscrollcommand = scrolly.set, xscrollcommand = scrollx.set)
         scroll_canvas.pack(side='top', fill='both', expand=True)
         
-
-        #the different boxes
+        #the basic layout
         settings_box = tk.Frame(scroll_canvas, bg='red')
         important_box = tk.Frame(rightbox)#box on the bottom right
-        shape_box = tk.Frame(leftpane, bg='green')
+        shape_box = tk.Frame(leftpane)
         plot_box = tk.Frame(leftpane, bg='blue')
 
         settings_box.pack(side='top', fill='both', expand=True)
@@ -136,30 +136,24 @@ class Startpage(tk.PanedWindow):
         leftpane.add(shape_box)
         leftpane.add(plot_box)
 
+        #important box
         mentat_button = ttk.Button(important_box, text='MarcMentat instances', command=lambda: parent.master.show_frame('marcMentat'))
         mentat_button.pack(side='right', padx=4, pady=4)
-
-        #scrolly.config(command=settings_box.yview)
-        #scrollx.config(command=settings_box.xview)
         
+        #shape box
+        f = matplotlib.figure.Figure()
+        self.shape_plot = f.add_subplot(111)
+        self.shape_plot.set_aspect('equal', adjustable='datalim')#scale of x- and y- axis equal
         
-
-#         topbox = tk.Frame(self)
-#         topbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-#         f = matplotlib.figure.Figure()
-#         self.plot = f.add_subplot(111)
-#         self.plot.set_aspect('equal', adjustable='datalim')#x- und y- achse gleich skaliert
+        #um die Zahlen an den Achsen unsichtbar zu machen
+        #self.shape_plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+        #self.shape_plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
         
-#         #um die Zahlen an den Achsen unsichtbar zu machen
-# ##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-# ##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-        
-#         self.canvas = FigureCanvasTkAgg(f, topbox)
-#         self.canvas.draw()
-#         toolbar = NavigationToolbar2Tk(self.canvas, topbox)
-#         toolbar.update()
-#         self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.shape_canvas = FigureCanvasTkAgg(f, shape_box)
+        self.shape_canvas.draw()
+        toolbar = NavigationToolbar2Tk(self.shape_canvas, shape_box)
+        toolbar.update()
+        self.shape_canvas.get_tk_widget().pack(side='top', fill='both', expand=True)
 
 #         rightbox = tk.Frame(self, bg='red')
 #         rightbox.pack(side=tk.RIGHT, fill=tk.Y)
@@ -177,19 +171,19 @@ class Startpage(tk.PanedWindow):
     
 
     def draw_shape_background(self,shp,markers=False,color='red'):
-        self.plot.plot(*shp.exterior.xy, color=color)
+        self.shape_plot.plot(*shp.exterior.xy, color=color)
         if markers:
-            self.plot.scatter(*shp.exterior.xy,color=color)
+            self.shape_plot.scatter(*shp.exterior.xy,color=color)
         for interior in shp.interiors:
-            self.plot.plot(*interior.xy, color=color)
+            self.shape_plot.plot(*interior.xy, color=color)
     def draw_shape_foreground(self,shp,fill_color='black'):
-        self.plot.fill(*shp.exterior.xy, color=fill_color, alpha=0.1)
-        self.plot.plot(*shp.exterior.xy, color='black')
-        self.plot.scatter(*shp.exterior.xy, color=self.restrictions_to_markercolors(shp))
+        self.shape_plot.fill(*shp.exterior.xy, color=fill_color, alpha=0.1)
+        self.shape_plot.plot(*shp.exterior.xy, color='black')
+        self.shape_plot.scatter(*shp.exterior.xy, color=self.restrictions_to_markercolors(shp))
 
         for interior in shp.interiors:
-            self.plot.fill(*interior.xy, color='white')
-            self.plot.plot(*interior.xy, marker = 'o', color='black')
+            self.shape_plot.fill(*interior.xy, color='white')
+            self.shape_plot.plot(*interior.xy, marker = 'o', color='black')
 
     def restrictions_to_markercolors(self,shp):
         markercolors = []
@@ -206,8 +200,8 @@ class Startpage(tk.PanedWindow):
         
     def draw_shape_comparison(self, shp, comparison_shape, autoscale):
         
-        self.plot.clear()
-        self.plot.autoscale(autoscale)#funktioniert noch nicht
+        self.shape_plot.clear()
+        self.shape_plot.autoscale(autoscale)#funktioniert noch nicht
 
         #um die Zahlen an den Achsen unsichtbar zu machen
 ##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
@@ -218,16 +212,16 @@ class Startpage(tk.PanedWindow):
         
         self.draw_shape_foreground(shp)
 
-        self.canvas.draw()
+        self.shape_canvas.draw()
 
     def draw_shape_pairing(self, shp1, shp2, merged_shape, autoscale):
-        self.plot.clear()
-        self.plot.autoscale(autoscale)
+        self.shape_plot.clear()
+        self.shape_plot.autoscale(autoscale)
         if merged_shape is not None:
             self.draw_shape_background(merged_shape,markers=True)
         self.draw_shape_foreground(shp1,fill_color='yellow')
         self.draw_shape_foreground(shp2,fill_color='green')
-        self.canvas.draw()
+        self.shape_canvas.draw()
   
 class MarcMentatPage(tk.Frame):
 
