@@ -109,11 +109,11 @@ class GUI(tk.Tk):
 class Startpage(tk.PanedWindow):
 
     def __init__(self, parent, core):
-        super().__init__(parent)
+        super().__init__(parent, borderwidth=0, sashwidth=4, sashrelief='sunken')
         self.core = core
 
         #some help-widgets (not so important)
-        leftpane = tk.PanedWindow(self, orient='vertical')
+        leftpane = tk.PanedWindow(self, orient='vertical', borderwidth=0, sashwidth=4, sashrelief='sunken')
         self.add(leftpane)
         rightbox = tk.Frame(self)
         self.add(rightbox)
