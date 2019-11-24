@@ -143,25 +143,22 @@ class Startpage(tk.Frame):
         test_shape.pack()
         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
+    def draw_shape_background(self,shp,color='red'):
+        self.plot.plot(*shp.exterior.xy, color=color)
+        for interior in shp.interiors:
+            self.plot.plot(*interior.xy, color=color)
+    def draw_shape_foreground(self,shp):
+        self.plot.fill(*shp.exterior.xy, color='black', alpha=0.1)
+        self.plot.plot(*shp.exterior.xy, color='black')
+        self.plot.scatter(*shp.exterior.xy, color=self.restrictions_to_markercolors(shp))
 
-    def draw_shape(self, shape, comparison_shape, autoscale):
-        
-        self.plot.clear()
-        self.plot.autoscale(autoscale)#funktioniert noch nicht
+        for interior in shp.interiors:
+            self.plot.fill(*interior.xy, color='white')
+            self.plot.plot(*interior.xy, marker = 'o', color='black')
 
-        #um die Zahlen an den Achsen unsichtbar zu machen
-##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
-        
-        if comparison_shape is not None:
-            self.plot.plot(*comparison_shape.exterior.xy, color='red')
-
-            interiors = comparison_shape.interiors
-            for interior in interiors:
-                self.plot.plot(*interior.xy, color='red')
-
+    def restrictions_to_markercolors(self,shp):
         markercolors = []
-        for restriction in shape.move_restrictions:
+        for restriction in shp.move_restrictions:
             if restriction:
                 if type(restriction) is tuple:
                     markercolors.append('yellow')
@@ -170,17 +167,24 @@ class Startpage(tk.Frame):
             else:
                 markercolors.append('black')
         markercolors.append(markercolors[0])
+        return markercolors
         
-        self.plot.fill(*shape.exterior.xy, color='black', alpha=0.1)
-        self.plot.plot(*shape.exterior.xy, color='black')
-        self.plot.scatter(*shape.exterior.xy, color=markercolors)
+    def draw_shape_comparison(self, shp, comparison_shape, autoscale):
+        
+        self.plot.clear()
+        self.plot.autoscale(autoscale)#funktioniert noch nicht
 
-        interiors = shape.interiors
-        for interior in interiors:
-            self.plot.fill(*interior.xy, color='white')
-            self.plot.plot(*interior.xy, marker = 'o', color='black')
+        #um die Zahlen an den Achsen unsichtbar zu machen
+##        self.plot.xaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+##        self.plot.yaxis.set_major_locator(matplotlib.pyplot.NullLocator())
+        
+        if comparison_shape:
+            self.draw_shape_background(comparison_shape)
+        
+        self.draw_shape_foreground(shp)
 
         self.canvas.draw()
+        
 
 class Mergingpage(tk.Frame):
 
@@ -464,12 +468,12 @@ class ToggledFrameContainer(tk.Frame):
         self.sub_frame = component
 
 gui = GUI()
-# c = core.Core()
-# c.inital_shape = examples.get_realisticreate_example_polygonc_example()
-# c.generate_first_generation()
-# gen = c.generations[0]
+c = core.Core()
+c.inital_shape = examples.get_realisticreate_example_polygonc_example()
+c.generate_first_generation()
+gen = c.generations[0]
 # for shp in gen:
-#     gui.draw_shape(shp, comparison_shape=c.inital_shape, autoscale=True)
+gui.draw_shape(c.generations[0][0], comparison_shape=c.inital_shape, autoscale=True)
 #     time.sleep(0)
 # gui.draw_shape(example, comparison_shape=example, autoscale=True)
 # example2 = examples.get_cool_example()
