@@ -11,7 +11,7 @@ def pair_shapes(shp1, shp2):
         shp_lines = shape.get_lines(shp)
         i = 0
         left = 0
-        for j in range(coords_num):
+        while i < len(shp_lines):
             distance = shape.get_distance(shp_lines[i][0],shp_lines[i][1])
             if distance+left > shp_l:
                 distance_on_line = shp_l-left
@@ -38,7 +38,8 @@ def pair_shapes(shp1, shp2):
 
     coords_new = []
     if len(shp1.exterior.coords) == len(shp1.exterior.coords):
-        coords_num = len(shp1.exterior.coords)-1
+        # coords_num = len(shp1.exterior.coords)-1
+        coords_num = 30
     else:
         print('Fehler')
 
@@ -46,10 +47,15 @@ def pair_shapes(shp1, shp2):
     coords_compare.append(get_even_spreaded_points(shp1,coords_num))
     coords_compare.append(get_even_spreaded_points(shp2,coords_num))
 
+    for i in range(coords_num):
+        point = shape.point_between_points(coords_compare[0][i],coords_compare[1][i])
+        coords_new.append(point)
     
+    return shape.Shape(coords_new)
 
         
 p=pair_shapes(p1,p2)
 plt.plot(*p1.exterior.xy, marker = 'o')
-plt.scatter(*p.exterior.xy,color='red')
+plt.plot(*p2.exterior.xy, marker = 'o',color='yellow')
+plt.plot(*p.exterior.xy,marker = 'o',color='red')
 plt.show()
