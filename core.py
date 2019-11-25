@@ -7,9 +7,6 @@ from tkinter import messagebox
 
 
 class Core:
-    '''
-    sdljflsdjflkjdsflkjdslkfj
-    '''
     def __init__(self):
         self.generations = [] #list with all generations, generation[0] is the inital generation
         self.inital_shape = None #Shape that the user wants to improve
@@ -22,10 +19,7 @@ class Core:
     def generate_first_generation(self): #fills the first array of self.generations with random shapes
         self.generations = []
         generation = []
-        activated_mutation_algorithms = []
-        for algorithm in self.mutation_algorithms:
-            if algorithm.activated:
-                activated_mutation_algorithms.append(algorithm)
+        activated_mutation_algorithms = [algo for algo in self.mutation_algorithms if algo.activated]
 
         if not self.inital_shape:
             messagebox.showerror('error', 'no initial shape')
@@ -33,7 +27,7 @@ class Core:
             messagebox.showerror('error', 'no mutation algorithm selected')
         else:
             for _ in range(self.first_generation_size):
-                algorithm = random.choice(self.mutation_algorithms)
+                algorithm = random.choice(activated_mutation_algorithms)
                 shp = algorithm.change_shape(self.inital_shape)
                 generation.append(shp)
             self.generations.append(generation)
