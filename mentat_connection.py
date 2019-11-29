@@ -1,15 +1,19 @@
 import random
 import pickle
+import threading
 
 HEADERSIZE = 20
 
 #die Instanzen der hier definierten Klassen werden vom Hauptprogramm zu Mentat geschickt
 #dort wird das Objekt entpackt und die methode execute aufgerufen
 class Task:
-    def __init__(self, coords, forces, fixed_displacements):
+    def __init__(self, coords, forces, fixed_displacements, read_in_algorithm, evaluation_algorithm):
+        #better to pass the shape object -> needs to be fixed
         self.coords = coords
         self.forces = forces
         self.fixed_displacements = fixed_displacements
+        self.read_in_algorithm = read_in_algorithm
+        self.evaluation_algorithm = evaluation_algorithm
 
     def execute(self, py_mentat, py_post, socket_connection):
         py_mentat.py_send('*clear_geometry')
@@ -42,3 +46,29 @@ class Test_connection:
         
         header = bytes('{message:<{width}}'.format(message=len(obj_bytes), width=HEADERSIZE), encoding='utf-8')
         socket_connection.sendall(header + obj_bytes)
+
+class Tasklist:
+    def __init__(self, shapes, read_in_algorithm, evaluation_algorithm):
+        self.read_in_algorithm = read_in_algorithm
+        self.evaluation_algorithm = evaluation_algorithm
+        self.shapes = shapes
+        self.evaluations = ['not evaluating']*len(shapes)#not evaluating, <value> or evaluating
+        self.lock = threading.Lock()
+
+    def return_evaluation(self, index, success, evaluation_value=None):
+        with self.lock:
+            if success:
+                self.evaluations[index] = evaluation_value
+            else:
+                self.evaluations[index] = 'not evaluating'
+
+    def get_next_task(self):
+        '''returns the task or None if there is no task left'''
+        with self.lock:
+            for i, evaluation in enumerate(self.evaluations):#maybe wrong!!!!!
+                if evaluation == 'not evaluating':
+                    task = Task(self.shapes[i].coords[:-1], self.shapes[i].forces, self.shapes[i].fixed_displacements, self.read_in_algorithm, self.evaluation_algorithm)
+                    self.evaluations[i] = 'evaluating'
+                    return (task, i)
+                #maybe good thing to add an else statement, where tasks that are already evaluating are evaluated multiple times so that
+                #slow machines can not slwo down the process
