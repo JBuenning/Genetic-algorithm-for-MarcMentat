@@ -1,10 +1,13 @@
 import shape
 import examples
 import mentat_connection
+from mentat_connection import HEADERSIZE, Test_connection, Simple_task
 import random
-from algorithms import mutation_algorithms
+from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms
 from tkinter import messagebox
 from concurrent.futures import ThreadPoolExecutor
+import socket
+import pickle
 
 
 class Core:
@@ -14,10 +17,26 @@ class Core:
         self.mutation_algorithms = mutation_algorithms.get_all_mutation_algorithms()
         self.mentat_connections = []
         #self.mentat_commands = [] #replaced by read_in and evaluation algorighm
-        self.read_in_algorithm = None
-        self.evaluation_algorithm = None
+        self.all_read_in_algorithms = read_in_algorithms.get_all_algorithms()
+        if len(self.all_read_in_algorithms) > 0:
+            self.set_read_in_algorithm(list(self.all_read_in_algorithms.keys())[0])
+        else:
+            self.read_in_algorithm = None
+            messagebox.showwarning('warning', 'found no read in algorithm')
+        self.all_evaluation_algorithms = evaluation_algorithms.get_all_algorithms()
+        if len(self.all_evaluation_algorithms) > 0:
+            self.set_evaluation_algorithm(list(self.all_evaluation_algorithms.keys())[0])
+        else:
+            self.evaluation_algorithm = None
+            messagebox.showwarning('warning', 'found no evaluation algorithm')
 
         self.default_settings()
+
+    def set_read_in_algorithm(self, algorithm):#otherwise no lambda expression in Gui for that possible
+        self.read_in_algorithm = algorithm
+
+    def set_evaluation_algorithm(self, algorithm):#otherwise no lambda expression in Gui for that possible
+        self.evaluation_algorithm = algorithm
 
     def generate_first_generation(self): #fills the first array of self.generations with random shapes
         self.generations = []
@@ -43,20 +62,40 @@ class Core:
 
     def evaluate_shapes(self, shapes):#in genera probably better to use a Queue
         def mentat_connection_loop(tasklist, connection):
+            HOST, PORT = connection
             task, index = tasklist.get_next_task()
             while not (task is None):
-                try:#maybe first try a testobject as the failure of connection might not be detected without timeout(but I am not quite sure)
-                    #pickle and send the task
-                    #result = wait for result
-                    result = None #to be changed!!!!
-                    tasklist.return_evaluation(index, True, result)
-                except:
-                    tasklist.return_evaluation(index, False)
-                    break
-                task, index = tasklist.get_next_task()
 
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.settimeout(1)
+                    try:#maybe first try a testobject as the failure of connection might not be detected without timeout(but I am not quite sure)
+                        s.connect((HOST, PORT))
+                        obj_bytes = pickle.dumps(task)
 
-        tasklist = mentat_connection.Tasklist(shapes, self.read_in_algorithm, self.evaluation_algorithm)
+                        if len(str(len(obj_bytes)))>HEADERSIZE:
+                            raise Exception('Length of the object to send exceeds header size. Increase HEADERSIZE')
+                        
+                        header = bytes('{message:<{width}}'.format(message=len(obj_bytes), width=HEADERSIZE), encoding='utf-8')
+                        s.sendall(header + obj_bytes)
+
+                        obj_recv = bytearray()
+                        data = s.recv(64)
+                        obj_length = int(data[:HEADERSIZE].decode('utf-8'))
+                        obj_recv.extend(data[HEADERSIZE:])
+                        while len(obj_recv) < obj_length:
+                            data = s.recv(64)
+                            obj_recv.extend(data)
+
+                        result = pickle.loads(obj_recv)
+                        print('result of calculation', result)
+                        tasklist.return_evaluation(index, True, result)
+                    except socket.error as e:
+                        print('fatal exception in one of the connections with mentat')
+                        tasklist.return_evaluation(index, False)
+                        break
+                    task, index = tasklist.get_next_task()
+
+        tasklist = mentat_connection.Tasklist(shapes, self.all_read_in_algorithms[self.read_in_algorithm], self.all_evaluation_algorithms[self.evaluation_algorithm])
 
         with ThreadPoolExecutor(max_workers=len(self.mentat_connections)) as executor:
             for connection in self.mentat_connections:
@@ -64,8 +103,9 @@ class Core:
 
         for evaluation in tasklist.evaluations:#test if tasklist was completely evaluated
             if isinstance(evaluation, str):
-                print(tasklist.evaluations)
+                print('wrong tasklist', tasklist.evaluations)
                 raise Exception('tasklist not evaluated correctly')
-
+        
+        print('the evaluation list:\n', tasklist.evaluations)
         return tasklist.evaluations
         

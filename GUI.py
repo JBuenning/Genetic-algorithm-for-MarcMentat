@@ -9,7 +9,7 @@ import time
 from mentat_connection import HEADERSIZE, Task, Test_connection
 import socket
 import pickle
-from algorithms import mutation_algorithms
+from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms
 
 
 class GUI(tk.Tk):
@@ -73,6 +73,9 @@ class GUI(tk.Tk):
 
     def save_as(self):
         print("save as")
+
+    def _test(self):
+        self.core.evaluate_shapes([examples.get_cool_example()])
 
     def test_exampleshape(self):
         for connection in self.get_mentat_connections():
@@ -168,10 +171,29 @@ class Startpage(tk.PanedWindow):
         container_mutation_algorithms.pack(fill='x', pady=3)
         for algo in self.core.mutation_algorithms:
             ToggledFrameAlgorithm(container_mutation_algorithms.sub_frame, algo).pack(fill='x', pady=3)
+
+        container_read_in_algorithms = ToggledFrameContainer(settings_box, 'read in method')
+        container_read_in_algorithms.pack(fill='x', pady=3)
+        all_read_in_algorithms = list(core.all_read_in_algorithms.keys())
+        read_in_list = ttk.Combobox(container_read_in_algorithms.sub_frame, values=all_read_in_algorithms, state='readonly')
+        read_in_list.bind('<<ComboboxSelected>>', lambda _ : self.core.set_read_in_algorithm(read_in_list.get()))
+        if len(core.all_read_in_algorithms) > 0:
+            read_in_list.set(core.read_in_algorithm)
+        read_in_list.pack()
+
+        container_evaluation_algorithms = ToggledFrameContainer(settings_box, 'calculation of fittness value')
+        container_evaluation_algorithms.pack(fill='x', pady=3)
+        all_evaluation_algorithms = list(core.all_evaluation_algorithms.keys())
+        evaluation_algo_list = ttk.Combobox(container_evaluation_algorithms.sub_frame, values=all_evaluation_algorithms, state='readonly')
+        evaluation_algo_list.bind('<<ComboboxSelected>>', lambda _ : self.core.set_evaluation_algorithm(evaluation_algo_list.get()))
+        if len(core.all_evaluation_algorithms) > 0:
+            evaluation_algo_list.set(core.evaluation_algorithm)
+        evaluation_algo_list.pack()
+
         #....
         container_tests = ToggledFrameContainer(settings_box, 'tests')
         container_tests.pack(fill='x', pady=3)
-        test_shape = ttk.Button(container_tests.sub_frame, text='Beispielshape einlesen', command=self.master.master.test_exampleshape)
+        test_shape = ttk.Button(container_tests.sub_frame, text='test', command=self.master.master._test)
         test_shape.pack()
 #         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
 #         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
