@@ -12,7 +12,7 @@ def get_all_algorithms():#to be improved
 
 class Read_in_algorithm:
 
-    def execute(self, shape_coords, py_mentat):
+    def execute(self, shape_coords, shape_fixed_dispacements, shape_forces, py_mentat):
         raise NotImplementedError
 
     def get_name(self):
@@ -29,6 +29,14 @@ class Basic_read_in(Read_in_algorithm):
     def get_name(self):
         return 'basic read in algorithm'
 
-    def execute(self, shape_coords, py_mentat):
+    def execute(self, shape_coords, shape_fixed_dispacements, shape_forces, py_mentat):
         print('something is read in')
-        pass
+        py_mentat.py_send('*new_model yes')
+        for point in shape_coords:
+            py_mentat.py_send("*add_points {},{},0".format(point[0], point[1]))
+
+        py_mentat.py_send('*set_curve_type line')
+
+        for i in range(1, len(shape_coords)):
+            py_mentat.py_send('*add_curves {},{}'.format(i, i+1))
+        py_mentat.py_send('*add_curves {},1'.format(len(shape_coords)))

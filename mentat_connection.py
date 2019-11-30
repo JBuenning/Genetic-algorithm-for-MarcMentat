@@ -21,12 +21,14 @@ class Task:
     def __init__(self, shape, read_in_algorithm, evaluation_algorithm):
         self.shape_area = shape.area
         self.shape_coords = list(shape.exterior.coords[:-1])
+        self.shape_fixed_displacements = shape.fixed_displacements
+        self.shape_forces = shape.forces
         self.read_in_algorithm = read_in_algorithm
         self.evaluation_algorithm = evaluation_algorithm
 
     def execute(self, py_mentat, py_post, socket_connection):
 
-        self.read_in_algorithm.execute(self.shape_coords, py_mentat)
+        self.read_in_algorithm.execute(self.shape_coords, self.shape_fixed_displacements, self.shape_forces, py_mentat)
         self.evaluation_algorithm.execute(self.shape_coords, self.shape_area, py_mentat, py_post, socket_connection)
 
         #this was the read in part

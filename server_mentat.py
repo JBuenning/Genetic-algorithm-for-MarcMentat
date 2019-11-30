@@ -2,7 +2,6 @@ import py_mentat
 import py_post
 import socket
 import pickle
-import shape
 from mentat_connection import Task, Test_connection, HEADERSIZE, Simple_task
 from algorithms import evaluation_algorithms, read_in_algorithms
 
@@ -30,7 +29,6 @@ def main():
                     data = conn.recv(64)
                     obj_recv.extend(data)
                 
-                print('obj received')
                 task = pickle.loads(obj_recv)
                 task.execute(py_mentat, py_post, conn)
                     

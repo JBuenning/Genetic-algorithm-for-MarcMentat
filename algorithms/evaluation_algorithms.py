@@ -25,15 +25,9 @@ class Evaluation_algorithm:
         label.pack()
         return frame
 
-class Min_stress_min_area(Evaluation_algorithm):
-
-    def get_name(self):
-        return 'min stress min area'
-
-    def execute(self, shape_coords, shape_area, py_mentat, py_post, connection):
+    def send_result(self, result, connection):
+        '''sends the calculated fittness back. The result should be of type float/int'''
         HEADERSIZE = 20#not dynamic! To be fixed
-        print('something is evaluated and returned')#just for testing
-        result = 42
 
         obj_bytes = pickle.dumps(result)
 
@@ -42,3 +36,16 @@ class Min_stress_min_area(Evaluation_algorithm):
         
         header = bytes('{message:<{width}}'.format(message=len(obj_bytes), width=HEADERSIZE), encoding='utf-8')
         connection.sendall(header + obj_bytes)
+
+class Min_stress_min_area(Evaluation_algorithm):
+
+    def get_name(self):
+        return 'min stress min area'
+
+    def execute(self, shape_coords, shape_area, py_mentat, py_post, connection):
+        print('something is evaluated and returned')#just for testing
+
+        #result is calculated
+        result = 42
+
+        self.send_result(result, connection)

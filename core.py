@@ -8,6 +8,7 @@ from tkinter import messagebox
 from concurrent.futures import ThreadPoolExecutor
 import socket
 import pickle
+import threading
 
 
 class Core:
@@ -67,7 +68,6 @@ class Core:
             while not (task is None):
 
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                    s.settimeout(1)
                     try:#maybe first try a testobject as the failure of connection might not be detected without timeout(but I am not quite sure)
                         s.connect((HOST, PORT))
                         obj_bytes = pickle.dumps(task)
@@ -87,7 +87,6 @@ class Core:
                             obj_recv.extend(data)
 
                         result = pickle.loads(obj_recv)
-                        print('result of calculation', result)
                         tasklist.return_evaluation(index, True, result)
                     except socket.error as e:
                         print('fatal exception in one of the connections with mentat')
