@@ -1,4 +1,5 @@
 import tkinter as tk
+import time
 
 def get_all_algorithms():#to be improved
     '''returns dictionary with all algorithms'''
@@ -40,3 +41,4 @@ class Basic_read_in(Read_in_algorithm):
         for i in range(1, len(shape_coords)):
             py_mentat.py_send('*add_curves {},{}'.format(i, i+1))
         py_mentat.py_send('*add_curves {},1'.format(len(shape_coords)))
+        time.sleep(1)#for simulating complicated task

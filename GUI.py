@@ -75,7 +75,7 @@ class GUI(tk.Tk):
         print("save as")
 
     def _test(self):
-        self.core.evaluate_shapes([examples.get_cool_example()])
+        self.core.evaluate_shapes([examples.get_realisticreate_example_polygonc_example()]*10)
 
     def test_exampleshape(self):
         for connection in self.get_mentat_connections():
@@ -489,24 +489,24 @@ class ToggledFrameContainer(tk.Frame):
             self.sub_frame.forget()
             self.toggle_button.configure(text='ᐅ')
 
-
-gui = GUI()
-#gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
-# gui.core.generate_first_generation()
-# gen = gui.core.generations[0]
-# merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
-# # gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
-# gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)
-# for shp in gen:
-#gui.draw_shape(c.generations[0][0], comparison_shape=c.inital_shape, autoscale=True)
-#     time.sleep(0)
-# gui.draw_shape(example, comparison_shape=example, autoscale=True)
-# example2 = examples.get_cool_example()
-# mutation_algorithm = mutation_algorithms.AlgorithmOne()
-# for i in range(1000):
-#     gui.draw_shape(example2, comparison_shape=example, autoscale=True)
-#     example2 = mutation_algorithm.change_shape(example2)
-#     time.sleep(0)
-#print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
-#gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
-gui.mainloop()
+if __name__=='__main__':
+    gui = GUI()
+    #gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
+    # gui.core.generate_first_generation()
+    # gen = gui.core.generations[0]
+    # merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
+    # # gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
+    # gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)
+    # for shp in gen:
+    #gui.draw_shape(c.generations[0][0], comparison_shape=c.inital_shape, autoscale=True)
+    #     time.sleep(0)
+    # gui.draw_shape(example, comparison_shape=example, autoscale=True)
+    # example2 = examples.get_cool_example()
+    # mutation_algorithm = mutation_algorithms.AlgorithmOne()
+    # for i in range(1000):
+    #     gui.draw_shape(example2, comparison_shape=example, autoscale=True)
+    #     example2 = mutation_algorithm.change_shape(example2)
+    #     time.sleep(0)
+    #print(shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()).exterior.coords)
+    #gui.draw_shape_merge(examples.merge_example_1(),examples.merge_example_2(),shape.join_shapes(examples.merge_example_1(),examples.merge_example_2()))
+    gui.mainloop()

@@ -6,10 +6,10 @@ import random
 from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms
 from tkinter import messagebox
 from concurrent.futures import ThreadPoolExecutor
+#from concurrent.futures import ProcessPoolExecutor as ThreadPoolExecutor
+import time
 import socket
 import pickle
-import threading
-
 
 class Core:
     def __init__(self):
@@ -66,6 +66,7 @@ class Core:
             HOST, PORT = connection
             task, index = tasklist.get_next_task()
             while not (task is None):
+                print(connection, 'does a task')
 
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     try:#maybe first try a testobject as the failure of connection might not be detected without timeout(but I am not quite sure)
@@ -96,8 +97,10 @@ class Core:
 
         tasklist = mentat_connection.Tasklist(shapes, self.all_read_in_algorithms[self.read_in_algorithm], self.all_evaluation_algorithms[self.evaluation_algorithm])
 
+        start_time = time.time()
         with ThreadPoolExecutor(max_workers=len(self.mentat_connections)) as executor:
             for connection in self.mentat_connections:
+                print(connection, 'is starting')
                 executor.submit(mentat_connection_loop, tasklist, connection)#exceptions might not be visible!!!
 
         for evaluation in tasklist.evaluations:#test if tasklist was completely evaluated
@@ -105,6 +108,7 @@ class Core:
                 print('wrong tasklist', tasklist.evaluations)
                 raise Exception('tasklist not evaluated correctly')
         
-        print('the evaluation list:\n', tasklist.evaluations)
+        print('the evaluation took {} seconds'.format(time.time()-start_time))
+        print('the evaluation list: ', tasklist.evaluations)
         return tasklist.evaluations
         
