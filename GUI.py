@@ -75,7 +75,7 @@ class GUI(tk.Tk):
         print("save as")
 
     def _test(self):
-        self.core.evaluate_shapes([examples.get_realisticreate_example_polygonc_example()]*10)
+        self.core.evaluate_shapes([examples.get_realisticreate_example_polygonc_example()])
 
     def test_exampleshape(self):
         for connection in self.get_mentat_connections():

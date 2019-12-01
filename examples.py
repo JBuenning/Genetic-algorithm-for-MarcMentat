@@ -46,7 +46,9 @@ def get_realisticreate_example_polygonc_example():
                          True,True,True,
                          True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 
-    return shape.Shape(shell, move_restrictions=move_restrictions)
+    forces = [(4,9)]*56
+
+    return shape.Shape(shell, move_restrictions=move_restrictions, forces=forces)
 
 def merge_example_1():
     shell = [(0,0),(1,2),(1,4),(1,6),(0,8),(2,8),(4,8),(6,8),(8,8),(8,6),(8,4),(8,2),(8,0),(6,0),(4,0),(2,0)]
