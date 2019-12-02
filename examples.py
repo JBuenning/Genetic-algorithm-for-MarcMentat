@@ -46,9 +46,13 @@ def get_realisticreate_example_polygonc_example():
                          True,True,True,
                          True,True,True,True,True,True,True,True,True,True,True,True,True,True]
 
-    forces = [(4,9)]*56
+    forces = [(False,False)]*17 + [(0, -100)] + [(False,False)]*38
 
-    return shape.Shape(shell, move_restrictions=move_restrictions, forces=forces)
+    #forces = [(4,9)]*56
+
+    fixed_displacements = [(False,False)]*39 + [(True,True)]*4 + [(False,False)]*13
+
+    return shape.Shape(shell, move_restrictions=move_restrictions, forces=forces, fixed_displacements=fixed_displacements)
 
 def merge_example_1():
     shell = [(0,0),(1,2),(1,4),(1,6),(0,8),(2,8),(4,8),(6,8),(8,8),(8,6),(8,4),(8,2),(8,0),(6,0),(4,0),(2,0)]

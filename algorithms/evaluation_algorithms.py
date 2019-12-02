@@ -43,9 +43,19 @@ class Min_stress_min_area(Evaluation_algorithm):
         return 'min stress min area'
 
     def execute(self, shape_coords, shape_area, py_mentat, py_post, connection):
-        print('something is evaluated and returned')#just for testing
+        print('evaluating shape')
+        py_mentat.py_send('*post_open_default')
+        py_mentat.py_send('*post_value Equivalent Von Mises Stress')
+        py_mentat.py_send('*post_contour_bands')
+        n_id = py_mentat.py_get_int("scalar_max_node()")
+        max_von_mises_stress = py_mentat.py_get_float('scalar_1({})'.format(n_id))
 
-        #result is calculated
+        if max_von_mises_stress:#check if something went wrong
+            print('the maximal Von Mises Stress is ', max_von_mises_stress)
+        else:
+            print('something went wrong')
+
+        #......actual result must be calculated
         result = 42
 
         self.send_result(result, connection)

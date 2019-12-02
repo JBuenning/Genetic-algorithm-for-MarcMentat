@@ -31,7 +31,7 @@ class Basic_read_in(Read_in_algorithm):
         return 'basic read in algorithm'
 
     def execute(self, shape_coords, shape_fixed_dispacements, shape_forces, py_mentat):
-        print('something is read in')
+        print('reading in shape')
         py_mentat.py_send('*new_model yes')
 
         #points
@@ -46,6 +46,17 @@ class Basic_read_in(Read_in_algorithm):
 
         #automesh
         py_mentat.py_send('*af_planar_trimesh all_existing')
+
+        #geometric properties
+        py_mentat.py_send('*new_geometry *geometry_type mech_planar_pstress')
+        py_mentat.py_send('*geometry_param norm_to_plane_thick 10')
+        py_mentat.py_send('*add_geometry_elements all_existing')
+
+        #material properties
+        py_mentat.py_send('*new_mater standard *mater_option general:state:solid *mater_option general:skip_structural:off')
+        py_mentat.py_send('*mater_param structural:youngs_modulus 10000')
+        py_mentat.py_send('*mater_param structural:poissons_ratio 0.3')
+        py_mentat.py_send('*add_mater_elements all_existing')
 
         #fixed displacements
         for i, fdp in enumerate(shape_fixed_dispacements):
@@ -66,5 +77,10 @@ class Basic_read_in(Read_in_algorithm):
                 if force[1]:
                     py_mentat.py_send('*apply_dof y *apply_dof_value y {}'.format(force[1]))
                 py_mentat.py_send('*add_apply_points {} #'.format(i+1))
+
+        #job
+        py_mentat.py_send('*prog_use_current_job on *new_job structural')
+        py_mentat.py_send('*add_post_var von_mises')
+        py_mentat.py_send('*submit_job 1 *monitor_job')
 
         #time.sleep(1)#for simulating complicated task
