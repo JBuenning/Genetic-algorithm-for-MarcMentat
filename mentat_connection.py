@@ -64,7 +64,7 @@ class Tasklist:
     def get_next_task(self):
         '''returns the task or None if there is no task left'''
         with self.lock:
-            for i, evaluation in enumerate(self.evaluations):#maybe wrong!!!!!
+            for i, evaluation in enumerate(self.evaluations):
                 if evaluation == 'not evaluating':
                     task = Task(self.shapes[i], self.read_in_algorithm, self.evaluation_algorithm)
                     self.evaluations[i] = 'evaluating'

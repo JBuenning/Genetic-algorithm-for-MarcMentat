@@ -51,11 +51,12 @@ class Min_stress_min_area(Evaluation_algorithm):
         max_von_mises_stress = py_mentat.py_get_float('scalar_1({})'.format(n_id))
 
         if max_von_mises_stress:#check if something went wrong
-            print('the maximal Von Mises Stress is ', max_von_mises_stress)
+            #print('the maximal Von Mises Stress is ', max_von_mises_stress)
+            result = 1/max_von_mises_stress#just for testing
         else:
             print('something went wrong')
+            result = -99999
 
         #......actual result must be calculated
-        result = 42
 
         self.send_result(result, connection)

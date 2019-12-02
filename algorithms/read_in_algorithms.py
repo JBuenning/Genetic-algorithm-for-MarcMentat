@@ -32,7 +32,14 @@ class Basic_read_in(Read_in_algorithm):
 
     def execute(self, shape_coords, shape_fixed_dispacements, shape_forces, py_mentat):
         print('reading in shape')
-        py_mentat.py_send('*new_model yes')
+        py_mentat.py_send('*post_close')
+        py_mentat.py_send('*clear_mesh')
+        py_mentat.py_send('*clear_geometry')
+        py_mentat.py_send('*remove_all_applys')
+        py_mentat.py_send('*new_geometry *geometry_type mech_three_beam_ela')
+        py_mentat.py_send('*new_mater standard *mater_option general:state:solid *mater_option general:skip_structural:off')
+        py_mentat.py_send('*remove_unused_geoms')
+        py_mentat.py_send('*remove_unused_maters')
 
         #points
         for point in shape_coords:
@@ -81,6 +88,6 @@ class Basic_read_in(Read_in_algorithm):
         #job
         py_mentat.py_send('*prog_use_current_job on *new_job structural')
         py_mentat.py_send('*add_post_var von_mises')
-        py_mentat.py_send('*submit_job 1 *monitor_job')
+        py_mentat.py_send('*submit_job 1')
 
         #time.sleep(1)#for simulating complicated task

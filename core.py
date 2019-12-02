@@ -66,7 +66,7 @@ class Core:
             HOST, PORT = connection
             task, index = tasklist.get_next_task()
             while not (task is None):
-                print(connection, 'does a task')
+                print(connection, 'does the task with index ', index)
 
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                     try:#maybe first try a testobject as the failure of connection might not be detected without timeout(but I am not quite sure)
@@ -88,6 +88,7 @@ class Core:
                             obj_recv.extend(data)
 
                         result = pickle.loads(obj_recv)
+                        print(connection, 'returns the task with index', index, ' and result ', result)
                         tasklist.return_evaluation(index, True, result)
                     except socket.error as e:
                         print('fatal exception in one of the connections with mentat')
