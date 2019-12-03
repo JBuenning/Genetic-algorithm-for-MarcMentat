@@ -23,7 +23,7 @@ class Core:
             self.set_read_in_algorithm(list(self.all_read_in_algorithms.keys())[0])
         else:
             self.read_in_algorithm = None
-            messagebox.showwarning('warning', 'found no read in algorithm')
+            messagebox.showwarning('warning', 'no read in algorithm found')
         self.all_evaluation_algorithms = evaluation_algorithms.get_all_algorithms()
         if len(self.all_evaluation_algorithms) > 0:
             self.set_evaluation_algorithm(list(self.all_evaluation_algorithms.keys())[0])
@@ -56,12 +56,13 @@ class Core:
             self.generations.append(generation)
 
     def default_settings(self):
-        self.first_generation_size = 60
+        self.first_generation_size = 5
     
     def mutate_shape(self,algorithm):
         pass
 
     def evaluate_shapes(self, shapes):#in genera probably better to use a Queue
+        '''takes a list of shapes, e.g. a gereration and evaluates them using one solver thread for each connected Mentat instance'''
         def mentat_connection_loop(tasklist, connection):
             HOST, PORT = connection
             task, index = tasklist.get_next_task()

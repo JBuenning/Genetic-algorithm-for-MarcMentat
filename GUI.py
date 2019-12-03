@@ -75,7 +75,8 @@ class GUI(tk.Tk):
         print("save as")
 
     def _test(self):
-        self.core.evaluate_shapes([examples.get_realisticreate_example_polygonc_example(), examples.get_cool_example(), examples.get_realisticreate_example_polygonc_example(), examples.get_cool_example()])
+        self.core.generate_first_generation()
+        self.core.evaluate_shapes(self.core.generations[0])
 
     def test_exampleshape(self):
         for connection in self.get_mentat_connections():
@@ -491,7 +492,7 @@ class ToggledFrameContainer(tk.Frame):
 
 if __name__=='__main__':
     gui = GUI()
-    #gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
+    gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
     # gui.core.generate_first_generation()
     # gen = gui.core.generations[0]
     # merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])

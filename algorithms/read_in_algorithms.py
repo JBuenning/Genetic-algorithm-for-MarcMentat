@@ -40,6 +40,7 @@ class Basic_read_in(Read_in_algorithm):
         py_mentat.py_send('*new_mater standard *mater_option general:state:solid *mater_option general:skip_structural:off')
         py_mentat.py_send('*remove_unused_geoms')
         py_mentat.py_send('*remove_unused_maters')
+        py_mentat.py_send('*remove_current_job')
 
         #points
         for point in shape_coords:
