@@ -7,9 +7,7 @@ from tkinter import messagebox
 
 
 class Core:
-    '''
-    sdljflsdjflkjdsflkjdslkfj
-    '''
+    
     def __init__(self):
         self.generations = [] #list with all generations, generation[0] is the inital generation
         self.inital_shape = None #Shape that the user wants to improve
@@ -34,7 +32,7 @@ class Core:
             self.generations.append(generation)
 
     def default_settings(self):
-        self.first_generation_size = 60
+        self.first_generation_size = 10
     
     def mutate_shape(self,algorithm):
         pass
