@@ -18,50 +18,34 @@ p2= c.generations[0][1]
 def pair_shapes(shp1, shp2):
         intersection = shp1.intersection(shp2)
         shps = [shp1,shp2]
-        bla = []
+        all_diffs = []
         for i,shp in enumerate(shps):
             other_shp = shps[int(not bool(i))]
-            diff = shp.difference(intersection)
+            diff = shp.difference(other_shp)
             if type(diff) == geometry.polygon.Polygon:
                 diffs = [diff]
             else:
                 diffs = list(diff)
-            new_diffs = []
-            for diff in diffs:
-                new_coords = []
-                for coord in diff.exterior.coords[:-1]:
-                    if not other_shp.contains(geometry.Point(coord)):
-                        new_coords.append(coord)
-                print(new_coords)
-                try:
-                    new_diffs.append(geometry.Polygon(new_coords))
-                except:
-                    pass
-                print(diff)
-                print('')
-            inner_points =  []
-            outer_points = []
-        farben=['green','red','blue','orange','pink','yellow','pruple','cyan','magenta']
-        for i,l in enumerate(diffs):
-            # f = geometry.LineString(l)
-            plt.plot(*l.exterior.xy, marker = 'o',color=farben[i])
-        for l in new_diffs:
-            # f = geometry.LineString(l)
-            plt.plot(*l.exterior.xy, marker = 'o',color='black')
-        return diff
-        #     for polygon in diff:
-        #         array = []
-        #         for point in polygon.exterior.coords[:-1]:
-        #             if point in intersection.exterior.coords[:-1]:
-        #                 array.append(point)
-        #         inner_points.append(array)
-        # return inner_points
-plt.plot(*p1.exterior.xy, marker = 'o',color='yellow')
-plt.plot(*p2.exterior.xy, marker = 'o',color='blue')
-# plt.show()
-x = pair_shapes(p1,p2)
-# print(x)
-# for l in x:
-#     # f = geometry.LineString(l)
-#     plt.plot(*l.exterior.xy, marker = 'o',color='red')
-plt.show()
+            all_diffs.extend(diffs)
+        return all_diffs
+
+# plt.plot(*p1.exterior.xy,color='blue')
+# plt.plot(*p2.exterior.xy,color='yellow')
+
+a = pair_shapes(p1,p2)
+
+intersection = p1.intersection(p2)
+i_coords = intersection.exterior.coords[:-1]
+keruzpunkte = []
+for coord in i_coords:
+    if coord not in p1.exterior.coords and coord not in p2.exterior.coords:
+        keruzpunkte.append(coord)
+
+for b in a:
+    print(b.exterior.coords)
+    print(len(b.exterior.coords))
+    plt.plot(*p1.exterior.xy,color='blue',marker='o')
+    plt.plot(*p2.exterior.xy,color='yellow',marker='o')
+    plt.plot(*b.exterior.xy,color='black',marker='x')
+    plt.scatter(*zip(*keruzpunkte),marker='o',color='red')
+    plt.show()
