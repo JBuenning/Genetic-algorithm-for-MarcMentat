@@ -1,7 +1,6 @@
-import shapely.geometry as geometry
+import matplotlib.pyplot as plt
 
-a = geometry.Polygon([(0,0),(0,1),(1,1),(1,0)])
+a = [(0,0),(1,1),(2,2)]
 
-b = geometry.Point(0,0)
-
-print(a.contains(b))
+plt.scatter(*zip(*a))
+plt.show()
