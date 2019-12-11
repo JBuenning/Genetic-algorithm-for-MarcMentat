@@ -1,7 +1,15 @@
 import shapely.geometry as geometry
+import shape
+import matplotlib.pyplot as plt
 
-a = geometry.Polygon([(0,0),(0,1),(1,1),(1,0)])
 
-b = geometry.Point(0,0)
+a = geometry.LineString([(0,0),(0,2)])
+c = shape.Shape([(0,0),(0,1),(1,1),(1,0)])
 
-print(a.contains(b))
+b = shape.get_even_spreaded_points(c,201)
+
+plt.plot(*c.exterior.xy,color='red',marker='o')
+plt.plot(*zip(*b),color='blue',marker='o')
+plt.show()
+
+print(b)

@@ -5,6 +5,101 @@ import random
 import math
 import examples
 
+    
+#shell - Liste mit tuples (Koordinaten)
+#move_restrictions - gleiche länge wie shell
+    #Ture - darf sich bewegen 
+    #False - darf sich nicht bewegen
+    #tuple - Vektor in welche Richtung Punkt sich bewegen darf
+#fixed_displacement - gleiche lände wie shell, enthält tuples mit x = True/False und y=True/False
+class Shape(geometry.Polygon):
+    def __init__(self, shell, holes=None, move_restrictions=None, fixed_displacements=None, forces=None):
+        super().__init__(shell, holes)
+
+        if move_restrictions is None:
+            self.move_restrictions = [False]*len(shell)
+        else:
+            self.move_restrictions=move_restrictions
+
+        if fixed_displacements is None:
+            self.fixed_displacements = [(False,False)]*len(shell)
+        else:
+            self.fixed_displacements=fixed_displacements
+
+        if forces is None:
+            self.forces = [(False,False)]*len(shell)
+        else:
+            self.forces=forces
+
+    def is_thick(self,factor=1):   
+        limit = shortest_line(self,'v')*factor
+        for point in self.exterior.coords[:-1]:
+            if smallest_distance_point_shape(point,self,True)[0] < limit:
+                return False
+        return True
+        
+        
+        #einige Methoden und Attribute, die schon da sind:
+            
+        #object.exterior.coords -> Liste mit äußeren Koordinaten [(x,y),(x,y)...]
+        #object.interior.coords -> innere Koordinaten[[(x,y),(x,y)...],[...],...]
+        #object.is_valid -> True wenn valid
+        #object.is_simple -> True wenn keine Überschneidung mit sich selbst
+        #object.area
+        #...
+
+def get_even_spreaded_points(obj,*args):
+        if type(obj) == list:
+            shp = geometry.LineString(obj)
+        # elif type(obj) !=  geometry.LineString and type(obj) != shape: #Fehler bei shape
+            # print('get_even_spreaded_points called with not suitable object')
+        else:#notlösung
+            shp = obj
+            coords_num = -1
+
+        shp_coords_compare = []
+        
+        shp_lines = get_lines(shp) # anpassen was passiert wenn shp linestring ist- methode anpassen
+        
+        if args:
+            coords_num=args[0]
+        else:
+            coords_num+=len(shp_lines)+1
+
+        shp_l = shp.length/coords_num
+        i = 0
+        left = 0
+        for j in range(coords_num):
+            distance = get_distance(shp_lines[i][0],shp_lines[i][1])# hier muss umgebaut werden vllt die for zur while shleife machen und immer wieder i kontrollieren
+            if distance+left > shp_l:
+                distance_on_line = shp_l-left
+                prozent = distance_on_line/distance
+                point = point_between_points(shp_lines[i][0],shp_lines[i][1],prozent)
+                shp_coords_compare.append(point)
+                left = distance-distance_on_line
+                left = round(left,15)
+                if left < shp_l:
+                    if i == len(shp_lines)-1:#eher notlösung
+                        shp_coords_compare.append(shp_lines[i][1])
+                        break
+                    i+=1
+                elif left > shp_l:
+                    left = -distance_on_line
+                elif left == shp_l:
+                    shp_coords_compare.append(shp_lines[i][1])
+                    if i == len(shp_lines)-1:
+                        break
+                    left = 0
+                    i +=1
+            elif distance+left <shp_l:
+                left = left+distance
+                i+=1
+            elif distance+left == shp_l:
+                shp_coords_compare.append(shp_lines[i][1])
+                left=0
+                i+=1
+        return shp_coords_compare
+
 def move_point(point, start, end, movement, restriction):
         sx, sy = start
         ex, ey = end
@@ -31,12 +126,16 @@ def get_distance(point1,point2):
     dy = y2 - y1
     return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
 
-def get_lines(shape):
-    coords = shape.exterior.coords[:-1]
+def get_lines(obj):
+    if type(obj) == geometry.LineString:
+        coords = list(obj.coords)
+    else: #anpassen dass es auf typ shape prüft
+        coords = obj.exterior.coords[:-1]
     lines = []
     for i in range(1,len(coords)):
         lines.append([coords[i-1],coords[i]])
-    lines.append([coords[len(coords)-1],coords[0]])
+    if type(obj) != geometry.LineString:#statt Line String auf shape prüfen ganz wichtig!!! Jonas fragen 
+        lines.append([coords[len(coords)-1],coords[0]])
     return lines
 
 def shortest_line(shape,data_type):#data_type - l gibt line zurück, v den wert
@@ -302,49 +401,6 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     s = even_out_shape(s, 3)
     return s
 
-
-    
-#shell - Liste mit tuples (Koordinaten)
-#move_restrictions - gleiche länge wie shell
-    #Ture - darf sich bewegen 
-    #False - darf sich nicht bewegen
-    #tuple - Vektor in welche Richtung Punkt sich bewegen darf
-#fixed_displacement - gleiche lände wie shell, enthält tuples mit x = True/False und y=True/False
-class Shape(geometry.Polygon):
-    def __init__(self, shell, holes=None, move_restrictions=None, fixed_displacements=None, forces=None):
-        super().__init__(shell, holes)
-
-        if move_restrictions is None:
-            self.move_restrictions = [False]*len(shell)
-        else:
-            self.move_restrictions=move_restrictions
-
-        if fixed_displacements is None:
-            self.fixed_displacements = [(False,False)]*len(shell)
-        else:
-            self.fixed_displacements=fixed_displacements
-
-        if forces is None:
-            self.forces = [(False,False)]*len(shell)
-        else:
-            self.forces=forces
-
-    def is_thick(self,factor=1):   
-        limit = shortest_line(self,'v')*factor
-        for point in self.exterior.coords[:-1]:
-            if smallest_distance_point_shape(point,self,True)[0] < limit:
-                return False
-        return True
-        
-        
-        #einige Methoden und Attribute, die schon da sind:
-            
-        #object.exterior.coords -> Liste mit äußeren Koordinaten [(x,y),(x,y)...]
-        #object.interior.coords -> innere Koordinaten[[(x,y),(x,y)...],[...],...]
-        #object.is_valid -> True wenn valid
-        #object.is_simple -> True wenn keine Überschneidung mit sich selbst
-        #object.area
-        #...
 
 
 if __name__=='__main__':
