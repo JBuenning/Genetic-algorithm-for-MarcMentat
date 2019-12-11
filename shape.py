@@ -66,7 +66,11 @@ def get_even_spreaded_points(obj,*args):
         else:
             coords_num+=len(shp_lines)+1
 
-        shp_l = shp.length/coords_num
+        if type(obj)==geometry.LineString:
+            shp_l = shp.length/(coords_num-1)
+            shp_coords_compare.append(shp_lines[0][0])
+        else:#notlösung
+            shp_l = shp.length/coords_num
         i = 0
         left = 0
         for j in range(coords_num):
