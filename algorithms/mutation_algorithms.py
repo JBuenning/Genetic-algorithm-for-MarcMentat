@@ -5,14 +5,25 @@ import random
 from algorithms import algorithm
 
 def get_all_mutation_algorithms():
-    array = []
-    one = AlgorithmOne()
-    array.append(one)
-    return array
+    """Returns an object of every mutation algorithm presen in this file
+    
+    Returns:
+        list: Contains one object of evers mutation algorithm
+    """
+    lst = [AlgorithmOne()]
+    return lst
 
 class MutationAlgorithm(algorithm.Algorithm):
 
-    def change_shape(self, shape):
+    def change_shape(self, shp):
+        """Changes a shape randomly
+        
+        Args:
+            shp (shape): Will be changed
+        
+        Raises:
+            NotImplementedError: If not overwritten
+        """
         raise NotImplementedError
 
 
@@ -27,7 +38,7 @@ class AlgorithmOne(MutationAlgorithm):
         self.max_recursiondepth=20
         self.n_times = 20
     
-    def set_default(self):
+    def set_default(self):# erklären lassen von jonas
         self.default_settings()
         self.ent_min_movement.delete(0,'end')
         self.ent_min_movement.insert(0, self.min_movement)

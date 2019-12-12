@@ -40,9 +40,13 @@ class Core:
         self.evaluation_algorithm = algorithm
 
     def generate_first_generation(self): #fills the first array of self.generations with random shapes
+        """Generates a generation of random shapes
+        
+        Fills the first position in the list self.generations with a list of random shapes called the inital generation
+        """
         self.generations = []
         generation = []
-        activated_mutation_algorithms = [algo for algo in self.mutation_algorithms if algo.activated]
+        activated_mutation_algorithms = [algorithm for algorithm in self.mutation_algorithms if algorithm.activated]
 
         if not self.inital_shape:
             messagebox.showerror('error', 'no initial shape')
@@ -56,8 +60,10 @@ class Core:
             self.generations.append(generation)
 
     def default_settings(self):
+        """Sets the settings of itself to the default settings
+        """
         self.first_generation_size = 5
-    
+
     def mutate_shape(self,algorithm):
         pass
 

@@ -23,7 +23,16 @@ def move_point(point, start, end, movement, restriction):
         y = py + movement*movement_y
         return (x,y)
 
-def get_distance(point1,point2):
+def distance(point1,point2):
+    """Calculates the distance between two points in the cartesian coordinate system
+    
+    Args:
+        point1 ((float,float)): Point 1
+        point2 ((float,float)): Point 2
+    
+    Returns:
+        float: Distance between Point 1 and Point 2
+    """
     x1,y1 = point1
     x2,y2 = point2
     dx = x2 - x1
@@ -38,32 +47,32 @@ def get_lines(shape):
     lines.append([coords[len(coords)-1],coords[0]])
     return lines
 
-def shortest_line(shape,data_type):#data_type - l gibt line zurück, v den wert
+def shortest_line(shape,data_type):
     lines = get_lines(shape)
     shortest_line = None
     for line in lines:
-        if  shortest_line == None or get_distance(line[0],line[1])<shortest_line:
+        if  shortest_line == None or distance(line[0],line[1])<shortest_line:
             if data_type == 'v':
-                shortest_line = get_distance(line[0],line[1])
+                shortest_line = distance(line[0],line[1])
             elif data_type == 'l':
                 shortest_line = line
     return shortest_line
         
 def line_intersection(line1, line2): 
     xdiff = (line1[0][0] - line1[1][0], line2[0][0] - line2[1][0]) 
-    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1]) #Typo was here 
+    ydiff = (line1[0][1] - line1[1][1], line2[0][1] - line2[1][1])
 
     def det(a, b): 
      return a[0] * b[1] - a[1] * b[0] 
 
     div = det(xdiff, ydiff) 
     if div == 0: 
-     raise Exception('lines do not intersect') 
+        raise Exception('lines do not intersect') 
 
     d = (det(*line1), det(*line2)) 
     x = det(d, xdiff)/div 
     y = det(d, ydiff)/div 
-    return x, y 
+    return x, y
 
 def smallest_distance_point_shape(point,shape,point_in_shape):
     def smallest_distance_point_line(point,line):
@@ -80,9 +89,9 @@ def smallest_distance_point_shape(point,shape,point_in_shape):
         except:
             t=(s[1]-y1)/m1[1]
         if t<=1 and t>=0:
-            return [get_distance(point,s),None]
+            return [distance(point,s),None]
         else:
-            return [min(get_distance(point,line[0]),get_distance(point,line[1])),line]
+            return [min(distance(point,line[0]),distance(point,line[1])),line]
         
     coords = shape.exterior.coords[:-1]
     lines = get_lines(shape)
@@ -105,12 +114,24 @@ def smallest_distance_point_shape(point,shape,point_in_shape):
             return [smallest_distance[0],True]#True - kürzeste Distanz liegt auf der Umrandung des Polygons
     return [smallest_distance[0],False]#False - kürzeste Distanz liegt nicht auf der Umrandung des Polygons
         
-def point_between_points(point1,point2,factor=0.5):#factor- 0.5 entspricht dem mittel
+def point_between_points(point1,point2,factor=0.5):
+    """Creates a point located on a line between two points in the cartesian coordinate system
+    
+    Args:
+        point1 ((float,float)): Point 1
+        point2 ((float,float)): Point 2
+        factor (float, optional): Determines where the new point is located. If 0 the new point equals Point 1,
+        if 0.5 the new point is in the middle between Point 1 and Point 2
+        and if 1 the point equals Point2. Defaults to 0.5.
+    
+    Returns:
+        ((float,float)): Point between Point 1 and Point 2
+    """
     x1,y1 = point1
     x2,y2 = point2
     x = ((x2-x1)*factor)+x1
     y = ((y2-y1)*factor)+y1
-    return (x,y)
+    return x,y
 
 def join_shapes(shape1,shape2):
     random_range = 0.2
@@ -126,8 +147,8 @@ def join_shapes(shape1,shape2):
         smallest_distance = 9999999
         for point1 in coords1:
             for point2 in coords2:
-                if get_distance(point1,point2) < smallest_distance:
-                    smallest_distance = get_distance(point1,point2)
+                if distance(point1,point2) < smallest_distance:
+                    smallest_distance = distance(point1,point2)
                     start_points = [point1,point2]
         coords_sorted = []
         for i in range(2):
