@@ -10,7 +10,7 @@ def get_all_pairing_algorithms():
     Returns:
         list: Contains one object of evers pairing algorithm
     """
-    lst = [SimpleIntersection()]
+    lst = [BooleanPairing()]
     return lst
 
 class PairingAlgorithm(algorithm.Algorithm):
@@ -37,17 +37,25 @@ class PairingAlgorithm(algorithm.Algorithm):
     def pair_fixed_displacements(self, fixed_displacement1, fixed_displacement2):
         return fixed_displacement1
 
-class SimpleIntersection(PairingAlgorithm):
+class BooleanPairing(PairingAlgorithm):
 
-    def pair_shapes(self, shp1, shp2):
-        intersection = shp1.intersection(shp2)
-        coords_intersection = intersection.exterior.coords[:-1]
+    def pair_shapes(self, shp1, shp2, *args):
+        boolean_fncs = [shp1.union,shp1.intersection]
+        if args:
+            if args[0]:
+                polygon_new = boolean_fncs[0](shp2)
+            else:
+                polygon_new = boolean_fncs[1](shp2)
+        else:
+            polygon_new = random.choice(boolean_fncs)(shp2)
+
+        coords_polygon_new = polygon_new.exterior.coords[:-1]
         coords_new = []
         move_restrictions_new = []
         fixed_displacements_new = []
         forces_new = []
         i = 0
-        for coord in coords_intersection:
+        for coord in coords_polygon_new:
             if coord in shp1.exterior.coords or coord in shp2.exterior.coords:
                 coords_new.append(coord)
                 if coord in shp1.exterior.coords:
@@ -88,8 +96,8 @@ class SimpleIntersection(PairingAlgorithm):
         return frame
 
     def get_name(self):
-        return 'Simple Intersection'
+        return 'Boolean Pairing'
 
     def get_description(self):
-        return '''Intersection of both shapes. Should be used when the area need to be decreased.
+        return '''Intersection or Union of both shapes. Intersection should be used when the area needs to be decreased and union should be used when the area needs to be increased.
         If the number of points has to stay the same newly created points during the intersection will be removed'''

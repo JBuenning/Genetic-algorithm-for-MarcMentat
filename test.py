@@ -1,9 +1,13 @@
-class A():
-    def a(self):
-        print('a')
+import random
 
-class B(A):
-    def b(self):
-        self.a()
+def a():
+    print('a')
+def b():
+    print('b')
 
-B().b()
+
+array = [a,b]
+
+fnc = random.choice(array)
+
+fnc()
