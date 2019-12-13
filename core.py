@@ -3,7 +3,7 @@ import examples
 import mentat_connection
 from mentat_connection import HEADERSIZE, Test_connection, Simple_task
 import random
-from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms
+from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms, pairing_algorithms
 from tkinter import messagebox
 from concurrent.futures import ThreadPoolExecutor
 #from concurrent.futures import ProcessPoolExecutor as ThreadPoolExecutor
@@ -16,6 +16,7 @@ class Core:
         self.generations = [] #list with all generations, generation[0] is the inital generation
         self.inital_shape = None #Shape that the user wants to improve
         self.mutation_algorithms = mutation_algorithms.get_all_mutation_algorithms()
+        self.pairing_algorithms = pairing_algorithms.get_all_pairing_algorithms()
         self.mentat_connections = []
         #self.mentat_commands = [] #replaced by read_in and evaluation algorighm
         self.all_read_in_algorithms = read_in_algorithms.get_all_algorithms()

@@ -9,7 +9,7 @@ import time
 from mentat_connection import HEADERSIZE, Task, Test_connection
 import socket
 import pickle
-from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms
+from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms, pairing_algorithms
 
 
 class GUI(tk.Tk):
@@ -172,6 +172,11 @@ class Startpage(tk.PanedWindow):
         container_mutation_algorithms.pack(fill='x', pady=3)
         for algo in self.core.mutation_algorithms:
             ToggledFrameAlgorithm(container_mutation_algorithms.sub_frame, algo).pack(fill='x', pady=3)
+        
+        container_pairing_algorithms = ToggledFrameContainer(settings_box, 'pairing algorithm')
+        container_pairing_algorithms.pack(fill='x', pady=3)
+        for algo in self.core.pairing_algorithms:
+            ToggledFrameAlgorithm(container_pairing_algorithms.sub_frame, algo).pack(fill='x', pady=3)
 
         container_read_in_algorithms = ToggledFrameContainer(settings_box, 'read in method')
         container_read_in_algorithms.pack(fill='x', pady=3)
@@ -493,8 +498,9 @@ class ToggledFrameContainer(tk.Frame):
 if __name__=='__main__':
     gui = GUI()
     gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
-    # gui.core.generate_first_generation()
-    # gen = gui.core.generations[0]
+    gui.core.generate_first_generation()
+    gen = gui.core.generations[0]
+    gui.pages['startpage'].draw_shape_pairing(gen[0],gen[1],gui.core.pairing_algorithms[0].pair_shapes(gen[0],gen[1]),True)
     # merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
     # # gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
     # gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)
