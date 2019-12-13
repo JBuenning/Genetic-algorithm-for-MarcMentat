@@ -50,12 +50,15 @@ class SimpleIntersection(PairingAlgorithm):
         for coord in coords_intersection:
             if coord in shp1.exterior.coords or coord in shp2.exterior.coords:
                 coords_new.append(coord)
-                move_restriction_new = self.pair_move_restrictions(shp1.move_restrictions[i],shp2.move_restrictions[i])
-                move_restrictions_new.append(move_restriction_new)
-                force_new = self.pair_forces(shp1.forces[i],shp2.forces[i])
-                forces_new.append(force_new)
-                fixed_displacement_new = self.pair_fixed_displacements(shp1.fixed_displacements[i],shp2.fixed_displacements[i])
-                fixed_displacements_new.append(fixed_displacement_new)
+                if coord in shp1.exterior.coords:
+                    shp = shp1
+                elif coord in shp2.exterior.coords:
+                    shp = shp2
+                coords = shp.exterior.coords[:-1]
+                index = coords.index(coord)
+                move_restrictions_new.append(shp.move_restrictions[index])
+                forces_new.append(shp.forces[index])
+                fixed_displacements_new.append(shp.fixed_displacements[index])
                 i += 1
             else:
                 if self.change_coords_num_allowed:
