@@ -133,43 +133,6 @@ def point_between_points(point1,point2,factor=0.5):
     y = ((y2-y1)*factor)+y1
     return x,y
 
-def join_shapes(shape1,shape2):
-    random_range = 0.2
-
-    coords1 = shape1.exterior.coords[:-1]
-    coords2 = shape2.exterior.coords[:-1]
-    coords = [coords1,coords2]
-    if len(coords1) != len(coords2):
-        print('Achtung ganz böse Ausnahme hier fehlt noch etwas Programmierarbeit um beide Listen auf die gleich eLänge zu bringen')
-    
-    if False:
-        start_points = []
-        smallest_distance = 9999999
-        for point1 in coords1:
-            for point2 in coords2:
-                if distance(point1,point2) < smallest_distance:
-                    smallest_distance = distance(point1,point2)
-                    start_points = [point1,point2]
-        coords_sorted = []
-        for i in range(2):
-            array = []
-            j = coords[i].index(start_points[i])
-            while j < len(coords[i]):
-                array.append(coords[i][j])
-                j += 1
-            for point in coords[i]:
-                if point == start_points[i]:
-                    break
-                else:
-                    array.append(point)
-            coords_sorted.append(array)
-        coords1,coords2 = coords_sorted
-
-    coords_new = []
-    for i in range(len(coords1)):
-        coords_new.append(point_between_points(coords1[i],coords2[i],0.5))
-    ### Hier muss noch überprüft werden ob denn restrictions usw bei beidne shapes übereinstimmen
-    return Shape(coords_new, shape1.interiors, shape1.move_restrictions, shape1.fixed_displacements, shape1.forces)
 
 
 #Algorithmus macht ähnliche Abstände zwischen Punkten und rundet die Form dabei ab. Die Fläche wird dabei kleiner
