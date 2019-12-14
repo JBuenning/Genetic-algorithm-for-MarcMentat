@@ -1,14 +1,9 @@
-import csv
-new = []
-with open('penis.csv','r',newline='\n') as file:
-    r = csv.reader(file)
-    i=0
-    for line in r:
-        if i == 10:
-            new.append(line)
-            i = 0
-        else:
-            i+=1
-with open('small_penis.csv','w',newline='\n') as file:
-    w = csv.writer(file)
-    w.writerows(new)
+import numpy as np
+array = ['a','b','c','d', 'e']
+
+p = [0.2, 0.2, 0.2, 0.2, 0.2]
+
+aa_milne_arr = ['pooh', 'rabbit', 'piglet', 'Christopher']
+c = np.random.choice(array, p=p)
+print(c)
+

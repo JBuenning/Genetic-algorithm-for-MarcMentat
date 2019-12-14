@@ -10,6 +10,7 @@ from mentat_connection import HEADERSIZE, Task, Test_connection
 import socket
 import pickle
 from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms, pairing_algorithms
+import threading
 
 
 class GUI(tk.Tk):
@@ -210,8 +211,9 @@ class Startpage(tk.PanedWindow):
     def optimization_button_pressed(self):
         self.core.set_optimization_running(not self.core.get_optimization_running())
         if self.core.get_optimization_running():
+            thread = threading.Thread(target=self.core.start_optimization)
+            thread.start()
             self.start_optimization_button.config(text='stop optimization')
-            self.core.start_optimization()
         else:
             self.start_optimization_button.config(text='start optimization')
 

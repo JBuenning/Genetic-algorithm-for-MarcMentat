@@ -55,7 +55,8 @@ class Min_stress_min_area(Evaluation_algorithm):
             result = 1/max_von_mises_stress#just for testing
         else:
             print('something went wrong')
-            result = -99999
+            result = shape_area
+            #result = -99999
 
         #......actual result must be calculated
 

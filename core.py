@@ -77,10 +77,11 @@ class Core:
     def build_next_generation(self, generation):
         fitnesses = [shape.fittness for shape in generation]
         fitness_sum = sum(fitnesses)
-        normalized_fittness = [fitnesses/fitness_sum for fitness in fitnesses]
+        normalized_fittness = [fitness/fitness_sum for fitness in fitnesses]
+        print(normalized_fittness)
         try:
-            shape1 = np.random.choice(generation, normalized_fittness)
-            shape2 = np.random.choice(generation, normalized_fittness)
+            shape1 = np.random.choice(generation, p=normalized_fittness)
+            shape2 = np.random.choice(generation, p=normalized_fittness)
         except ValueError as e:
             messagebox.showerror('error', e)
             raise
