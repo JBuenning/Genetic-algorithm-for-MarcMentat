@@ -65,13 +65,13 @@ class Core:
             raise NoMentatConnectionException
 
         if not self.generations:
-            print('generate first generation')
-            self.generate_first_generation
+            self.generate_first_generation()
 
         while self.optimization_running:
+            print('laenge of gernerations ',len(self.generations))
             self.evaluate_shapes(self.generations[-1])
             self.generations.append(self.build_next_generation(self.generations[-1]))
-            print(len(self.generations))
+            
 
 
     def build_next_generation(self, generation):
@@ -99,7 +99,7 @@ class Core:
         
         Fills the first position in the list self.generations with a list of random shapes called the inital generation
         """
-        self.generations = []
+        self.generations = []#maybe bad
         generation = []
         activated_mutation_algorithms = [algorithm for algorithm in self.mutation_algorithms if algorithm.activated]
 

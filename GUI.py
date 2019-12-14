@@ -510,7 +510,7 @@ class ToggledFrameContainer(tk.Frame):
 
 if __name__=='__main__':
     gui = GUI()
-    gui.core.inital_shape=shape.csv_to_shape('penis.csv')
+    gui.core.inital_shape=shape.csv_to_shape('small_penis.csv')
 
     # gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
     # gui.core.generate_first_generation()
