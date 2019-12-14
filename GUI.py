@@ -114,6 +114,7 @@ class Startpage(tk.PanedWindow):
 
     def __init__(self, parent, core):
         super().__init__(parent, borderwidth=0, sashwidth=4, sashrelief='sunken')
+
         self.core = core
 
         #some help-widgets (not so important)
@@ -144,7 +145,9 @@ class Startpage(tk.PanedWindow):
         #important box
         mentat_button = ttk.Button(important_box, text='MarcMentat instances', command=lambda: parent.master.show_frame('marcMentat'))
         mentat_button.pack(side='right', padx=4, pady=4)
-        
+        self.start_optimization_button = ttk.Button(important_box, text='start optimaization', command=self.optimization_button_pressed)
+        self.start_optimization_button.pack(side='left', padx=4, pady=4)
+
         #shape box
         f = matplotlib.figure.Figure()
         self.shape_plot = f.add_subplot(111)
@@ -203,6 +206,16 @@ class Startpage(tk.PanedWindow):
         test_shape.pack()
 #         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
 #         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
+
+    def optimization_button_pressed(self):
+        self.core.set_optimization_running(not self.core.get_optimization_running())
+        if self.core.get_optimization_running():
+            self.start_optimization_button.config(text='stop optimization')
+            self.core.start_optimization()
+        else:
+            self.start_optimization_button.config(text='start optimization')
+
+        
     
     def plot_graph(self, *args, **options):
         '''works exactly like matplotlib.pyplot.plot()'''
@@ -497,10 +510,12 @@ class ToggledFrameContainer(tk.Frame):
 
 if __name__=='__main__':
     gui = GUI()
-    gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
-    gui.core.generate_first_generation()
-    gen = gui.core.generations[0]
-    gui.pages['startpage'].draw_shape_pairing(gen[0],gen[1],gui.core.pairing_algorithms[0].pair_shapes(gen[0],gen[1]),True)
+    gui.core.inital_shape=shape.csv_to_shape('penis.csv')
+
+    # gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
+    # gui.core.generate_first_generation()
+    # gen = gui.core.generations[0]
+    # gui.pages['startpage'].draw_shape_pairing(gen[0],gen[1],gui.core.pairing_algorithms[0].pair_shapes(gen[0],gen[1]),True)
     # merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
     # # gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
     # gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)

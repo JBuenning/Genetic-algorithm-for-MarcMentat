@@ -10,9 +10,13 @@ from concurrent.futures import ThreadPoolExecutor
 import time
 import socket
 import pickle
+import threading
+import numpy as np
 
 class Core:
     def __init__(self):
+        self.lock = threading.Lock()
+        self.optimization_running = False
         self.generations = [] #list with all generations, generation[0] is the inital generation
         self.inital_shape = None #Shape that the user wants to improve
         self.mutation_algorithms = mutation_algorithms.get_all_mutation_algorithms()
@@ -37,8 +41,58 @@ class Core:
     def set_read_in_algorithm(self, algorithm):#otherwise no lambda expression in Gui for that possible
         self.read_in_algorithm = algorithm
 
+    def set_optimization_running(self, running: bool):
+        with self.lock:
+            self.optimization_running = running
+
+    def get_optimization_running(self):
+        with self.lock:
+            return self.optimization_running
+
     def set_evaluation_algorithm(self, algorithm):#otherwise no lambda expression in Gui for that possible
         self.evaluation_algorithm = algorithm
+
+    def start_optimization(self):
+        print('start optimization')
+        if not [algorithm for algorithm in self.mutation_algorithms if algorithm.activated]:
+            messagebox.showerror('error', 'no active mutation algorithm')
+            raise MissingAlgorithmException('no activated mutation algorithm')
+        if not [algorithm for algorithm in self.pairing_algorithms if algorithm.activated]:
+            messagebox.showerror('error', 'no active pairing algorithm')
+            raise MissingAlgorithmException('no activated pairing algorithm')
+        if not self.mentat_connections:
+            messagebox.showerror('error', 'no Mentat instance connected.')
+            raise NoMentatConnectionException
+
+        if not self.generations:
+            print('generate first generation')
+            self.generate_first_generation
+
+        while self.optimization_running:
+            self.evaluate_shapes(self.generations[-1])
+            self.generations.append(self.build_next_generation(self.generations[-1]))
+            print(len(self.generations))
+
+
+    def build_next_generation(self, generation):
+        fitnesses = [shape.fittness for shape in generation]
+        fitness_sum = sum(fitnesses)
+        normalized_fittness = [fitnesses/fitness_sum for fitness in fitnesses]
+        try:
+            shape1 = np.random.choice(generation, normalized_fittness)
+            shape2 = np.random.choice(generation, normalized_fittness)
+        except ValueError as e:
+            messagebox.showerror('error', e)
+            raise
+        next_generation = []
+
+        for _ in range(len(generation)):
+            pairing_algorithm = random.choice([algorithm for algorithm in self.pairing_algorithms if algorithm.activated])
+            new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
+            next_generation.append(new_shape)
+
+        return next_generation
+        
 
     def generate_first_generation(self): #fills the first array of self.generations with random shapes
         """Generates a generation of random shapes
@@ -51,8 +105,8 @@ class Core:
 
         if not self.inital_shape:
             messagebox.showerror('error', 'no initial shape')
-        elif not activated_mutation_algorithms:
-            messagebox.showerror('error', 'no mutation algorithm selected')
+            raise MissingInitialShapeException
+
         else:
             for _ in range(self.first_generation_size):
                 algorithm = random.choice(activated_mutation_algorithms)
@@ -119,5 +173,16 @@ class Core:
         
         print('the evaluation took {} seconds'.format(time.time()-start_time))
         print('the evaluation list: ', tasklist.evaluations)
-        return tasklist.evaluations
-        
+
+        for i, shape in enumerate(shapes):
+            shape.fittness = tasklist.evaluations[i]
+
+
+class MissingAlgorithmException(Exception):
+    pass
+
+class MissingInitialShapeException(Exception):
+    pass
+
+class NoMentatConnectionException(Exception):
+    pass

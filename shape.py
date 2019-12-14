@@ -3,6 +3,7 @@ import numpy as np
 import random
 import math
 import examples
+import csv
 
 def move_point(point, start, end, movement, restriction):
         sx, sy = start
@@ -284,6 +285,15 @@ def change_shape_two(shape, min_movement=0.1, max_movement=1):
     s = even_out_shape(s, 3)
     return s
 
+def csv_to_shape(file_path):
+    with open(file_path,'r') as file:
+        csv_reader = csv.reader(file)
+        coords = []
+        next(csv_reader,None)
+        for line in csv_reader:
+            coords.append((float(line[5]),float(line[6])))
+        return Shape(coords)
+
 
     
 #shell - Liste mit tuples (Koordinaten)
@@ -310,6 +320,8 @@ class Shape(geometry.Polygon):
             self.forces = [(False,False)]*len(shell)
         else:
             self.forces=forces
+
+        self.fittness = None
 
     def is_thick(self,factor=1):   
         limit = shortest_line(self,'v')*factor

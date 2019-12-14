@@ -1,13 +1,3 @@
-import random
+import numpy as np
 
-def a():
-    print('a')
-def b():
-    print('b')
-
-
-array = [a,b]
-
-fnc = random.choice(array)
-
-fnc()
+print(np.random.choice(['a', 'b', 'c', 'd'], p=[0,0,0,0.9999999999999]))
