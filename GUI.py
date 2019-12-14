@@ -10,6 +10,8 @@ from mentat_connection import HEADERSIZE, Task, Test_connection
 import socket
 import pickle
 from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms, pairing_algorithms
+import os
+
 import threading
 
 
@@ -511,6 +513,9 @@ class ToggledFrameContainer(tk.Frame):
             self.toggle_button.configure(text='ᐅ')
 
 if __name__=='__main__':
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
     gui = GUI()
     gui.core.inital_shape=shape.csv_to_shape('small_penis.csv')
 
