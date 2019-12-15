@@ -259,8 +259,11 @@ class Startpage(tk.PanedWindow):
     def show_improvement_history(self,improvement_history):
         generation_nums = [line[0] for line in improvement_history]
         fittness_means = [line[2] for line in improvement_history]
+        fittness_min = [line[4]for line in improvement_history]
+        fittness_max = [line[3]for line in improvement_history]
         print(improvement_history)
         self.plot_graph(generation_nums,fittness_means)
+        self.graph_plot.fill_between(generation_nums,fittness_min,fittness_max,color='blue',alpha=0.2)
         
     def draw_shape_comparison(self, shp, comparison_shape, autoscale):
         
