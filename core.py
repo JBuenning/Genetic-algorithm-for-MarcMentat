@@ -44,6 +44,15 @@ class Core:
     def set_read_in_algorithm(self, algorithm):#otherwise no lambda expression in Gui for that possible
         self.read_in_algorithm = algorithm
 
+    def find_best_shape(self):
+        best_shape = []
+        for generation in self.generations:
+            for shp in generation:
+                if not best_shape or shp.fittness > best_shape[0].fittness:
+                    best_shape.append(shp)
+                elif best_shape[0].fittness != None and shp.fittness == best_shape[0].fittness:
+                    best_shape.append(shp)
+
     def set_optimization_running(self, running: bool):
         with self.lock:
             self.optimization_running = running
