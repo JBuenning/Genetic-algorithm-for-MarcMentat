@@ -74,7 +74,10 @@ class BasicPairing(PairingAlgorithm):
         for i in range(len(coords1)):
             coords_new.append(shape.point_between_points(coords1[i],coords2[i],0.5))
         ### Hier muss noch überprüft werden ob denn restrictions usw bei beidne shapes übereinstimmen
-        return shape.Shape(coords_new, shape1.interiors, shape1.move_restrictions, shape1.fixed_displacements, shape1.forces)
+        s = shape.Shape(coords_new, shape1.interiors, shape1.move_restrictions, shape1.fixed_displacements, shape1.forces)
+        if not s.is_valid or not s.is_simple:
+            s = random.choice([shape1,shape2])
+        return s
 
     def default_settings(self):
         pass
