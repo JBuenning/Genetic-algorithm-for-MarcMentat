@@ -500,7 +500,8 @@ if __name__=='__main__':
     gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
     gui.core.generate_first_generation()
     gen = gui.core.generations[0]
-    gui.pages['startpage'].draw_shape_pairing(gen[0],gen[1],gui.core.pairing_algorithms[0].pair_shapes(gen[0],gen[1]),True)
+    gui.pages['startpage'].draw_shape_foreground(gui.core.mutation_algorithms[1].change_shape(gen[0]))
+    # gui.pages['startpage'].draw_shape_pairing(gen[0],gen[1],gui.core.pairing_algorithms[0].pair_shapes(gen[0],gen[1]),True)
     # merged_shape=shape.join_shapes(gui.core.generations[0][0],gui.core.generations[0][1])
     # # gui.pages['startpage'].draw_shape_comparison(gui.core.generations[0][0],gui.core.inital_shape,True)
     # gui.pages['startpage'].draw_shape_pairing(gui.core.generations[0][0],gui.core.generations[0][1],merged_shape,True)

@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import random
 from algorithms import algorithm
+import math
 
 def get_all_mutation_algorithms():
     """Returns an object of every mutation algorithm presen in this file
@@ -10,7 +11,7 @@ def get_all_mutation_algorithms():
     Returns:
         list: Contains one object of evers mutation algorithm
     """
-    lst = [AlgorithmOne()]
+    lst = [AlgorithmOne(),AlgorithmTwo()]
     return lst
 
 class MutationAlgorithm(algorithm.Algorithm):
@@ -158,6 +159,108 @@ class AlgorithmOne(MutationAlgorithm):
     def get_name(self):
         return 'Algorithm One'
 
+class AlgorithmTwo(MutationAlgorithm):
+
+    def change_shape(self,shp):
+        def move_point(point, start, end, movement, restriction):
+            sx, sy = start
+            ex, ey = end
+            px, py = point
+            if restriction:
+                if type(restriction) is tuple:
+                    movement_x, movement_y = restriction
+                else:
+                    pass
+            else:
+                movement_x = ey - sy
+                movement_y = sx - ex
+
+            movement = movement * (math.sqrt(math.pow(movement_x, 2) + math.pow(movement_y, 2))/math.sqrt(math.pow(ex-sx, 2) + math.pow(ey-sy, 2)))
+
+            x = px + movement*movement_x
+            y = py + movement*movement_y
+            return (x,y)
+
+        def linear_function(shp,coords_change):
+            ### Lineare Funktion ###
+            coords = shp.exterior.coords[:-1]
+            start_coord = coords_change[0]
+            end_coord = coords_change[len(coords_change)-1]
+            in_or_out = random.choice([-1,1])
+            if (len(coords_change) % 2) != 0:
+                r=0
+                start_len = end_len = int(len(coords_change)/2)+1
+            else:
+                r = random.randint(0,1)
+                if bool(r):
+                    start_len = int(len(coords_change)/2)
+                    end_len = int(len(coords_change)/2)+1
+                else:
+                    start_len = int(len(coords_change)/2)+1
+                    end_len = int(len(coords_change)/2)
+            #mid_coord = coords_change[int((len(coords_change)/2))-r]
+            for i in range(start_len):
+                coords[coords.index(coords_change[i])] = move_point(coords_change[i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+            for i in range(end_len-1):
+                coords[coords.index(coords_change[len(coords_change)-1-i])] = move_point(coords_change[len(coords_change)-1-i],start_coord,end_coord,(i/(start_len-1))*0.1*in_or_out,False)
+            return shape.Shape(coords, shp.interiors, shp.move_restrictions, shp.fixed_displacements, shp.forces)
+        def help(shp):
+            ### Zu ändernde Koordinaten werden bestimmt ###
+            coords = shp.exterior.coords[:-1]
+            coords_free = []
+            coords_change = []
+            min_num_changed_coords = 1
+            for i, coord in enumerate(coords):
+                if shp.move_restrictions[i] == False: #später anpassen auf teilweise eingeschränkte Punkte
+                    coords_free.append(coord)
+            start = random.randint(0,int(len(coords_free)/2))#int(len(coords2)/2) nur zum ausprobieren kann auch anders gewählt werden
+            for i in range(start,random.randint(start+min_num_changed_coords+2,len(coords_free)-1)):#len(coords_free)-1 eventuell stärker eingrenzen
+                coords_change.append(coords_free[i])
+            
+            ### Umformung ###
+            s = linear_function(shp,coords_change)
+
+            ### Kontrollen ###
+            while not(s.is_valid) or not(s.is_simple) or not(s.is_thick()):
+                s = self.change_shape(shp)
+
+            ### Glätten ###
+            s = shape.even_out_shape(s, 3)
+            return s
+        
+        for _ in range(self.n_times):
+            shp = help(shp)
+        return shp
+
     
+    def get_name(self):
+        return 'Algorithm Two'
     
+    def default_settings(self):
+        self.n_times = 1
     
+    def set_default(self):# erklären lassen von jonas
+        self.default_settings()
+        self.ent_n_times.delete(0, 'end')
+        self.ent_n_times.insert(0, self.n_times)
+    
+    def apply(self):
+        try:
+            self.n_times = int(self.ent_n_times.get())
+            self.ent_n_times.delete(0, 'end')
+            self.ent_n_times.insert(0, self.n_times)
+        except:
+            self.ent_n_times.delete(0, 'end')
+            self.ent_n_times.insert(0, self.n_times)
+    
+    def get_settings_frame(self, master):
+        frame = tk.Frame(master)
+        tk.Label(frame, text='repetitions').grid(row=3, column=0, sticky='w')
+        self.ent_n_times = tk.Entry(frame, width=5)
+        self.ent_n_times.grid(row=3, column=1)
+        apply = ttk.Button(frame, text='apply', command=self.apply)
+        apply.grid(row=4, column=0, pady=4)
+        default = ttk.Button(frame, text='reset', command=self.set_default)
+        default.grid(row=4, column=1, pady=4)
+        self.set_default()
+        return frame
