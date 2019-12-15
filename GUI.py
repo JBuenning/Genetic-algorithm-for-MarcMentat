@@ -220,13 +220,6 @@ class Startpage(tk.PanedWindow):
             self.show_improvement_history(self.core.improvement_history)
             self.start_optimization_button.config(text='start optimization')
 
-        
-    
-    def plot_graph(self, *args, **options):
-        '''works exactly like matplotlib.pyplot.plot()'''
-
-        self.graph_plot.clear()
-        self.graph_plot.plot(*args, **options)
 
     def draw_shape_background(self,shp,markers=False,color='red'):
         self.shape_plot.plot(*shp.exterior.xy, color=color)
@@ -263,7 +256,7 @@ class Startpage(tk.PanedWindow):
         fittness_max = [line[3]for line in improvement_history]
         print(improvement_history)
         self.plot_graph(generation_nums,fittness_means)
-        self.graph_plot.fill_between(generation_nums,fittness_min,fittness_max,color='blue',alpha=0.2)
+        self.plot_graph.fill_between(generation_nums,fittness_min,fittness_max,color='blue',alpha=0.2)
         
     def draw_shape_comparison(self, shp, comparison_shape, autoscale):
         
