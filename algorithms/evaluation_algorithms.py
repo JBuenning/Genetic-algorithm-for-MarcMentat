@@ -42,7 +42,7 @@ class Min_stress_min_area(Evaluation_algorithm):
     def get_name(self):
         return 'min stress min area'
 
-    def execute(self, shape_coords, shape_area, py_mentat, py_post, connection):
+    def execute(self, shape_coords,shape_length, shape_area, py_mentat, py_post, connection):
         print('evaluating shape')
         py_mentat.py_send('*post_open_default')
         py_mentat.py_send('*post_value Equivalent Von Mises Stress')
@@ -55,7 +55,7 @@ class Min_stress_min_area(Evaluation_algorithm):
             result = 1/max_von_mises_stress#just for testing
         else:
             print('something went wrong')
-            result = shape_area
+            result = shape_area/shape_length
             #result = -99999
 
         #......actual result must be calculated

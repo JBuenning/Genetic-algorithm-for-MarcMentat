@@ -76,7 +76,7 @@ class BasicPairing(PairingAlgorithm):
         ### Hier muss noch überprüft werden ob denn restrictions usw bei beidne shapes übereinstimmen
         s = shape.Shape(coords_new, shape1.interiors, shape1.move_restrictions, shape1.fixed_displacements, shape1.forces)
         if not s.is_valid or not s.is_simple:
-            s = random.choice([shape1,shape2])
+            s = random.choice([shape1,shape2]) # different solution in the future
         return s
 
     def default_settings(self):

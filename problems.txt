@@ -1,0 +1,3 @@
+wenn man auf start optimization klickt und ein Fehler entsteht der verhindert, dass die optimization nicht gestartet wird switcht der button trotzdem zu 'stop optimization'
+
+fatal exception on one of the connections with mentat -> führt nicht zum rausschmiss dieser mentat connection
