@@ -3,7 +3,7 @@ import examples
 import mentat_connection
 from mentat_connection import HEADERSIZE, Test_connection, Simple_task
 import random
-from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms, pairing_algorithms
+from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms, pairing_algorithms, evolution_algorithms
 from tkinter import messagebox
 from concurrent.futures import ThreadPoolExecutor
 #from concurrent.futures import ProcessPoolExecutor as ThreadPoolExecutor
@@ -26,6 +26,12 @@ class Core:
         self.pairing_algorithms = pairing_algorithms.get_all_pairing_algorithms()
         self.mentat_connections = []
         #self.mentat_commands = [] #replaced by read_in and evaluation algorighm
+        self.all_evolution_algorithms = evolution_algorithms.get_all_algorithms(self)
+        if len(self.all_evolution_algorithms) > 0:
+            self.set_evolution_algorithm(list(self.all_evolution_algorithms.keys())[0])
+        else:
+            self.evolution_algorithm = None
+            messagebox.showwarning('warning', 'no evolution algorithm found')
         self.all_read_in_algorithms = read_in_algorithms.get_all_algorithms()
         if len(self.all_read_in_algorithms) > 0:
             self.set_read_in_algorithm(list(self.all_read_in_algorithms.keys())[0])
@@ -43,6 +49,9 @@ class Core:
 
     def set_read_in_algorithm(self, algorithm):#otherwise no lambda expression in Gui for that possible
         self.read_in_algorithm = algorithm
+    
+    def set_evolution_algorithm(self, algorithm):#otherwise no lambda expression in Gui for that possible
+        self.evolution_algorithm = algorithm
 
     def find_best_shape(self):
         best_shape = []
@@ -85,7 +94,7 @@ class Core:
             generation = self.generations[-1]
             self.evaluate_shapes(generation)
             self.save_improvement(generation,self.generations.index(generation))
-            self.generations.append(self.build_next_generation(generation))
+            self.generations.append(self.evolution_algorithm.build_next_generation(generation))
 
     def save_improvement(self,generation,gen_num):
         fittnesses = []
@@ -95,29 +104,6 @@ class Core:
         max_fittness = max(fittnesses)
         min_fittness = min(fittnesses)
         self.improvement_history.append([gen_num,fittnesses,mean_fittness,max_fittness,min_fittness])
-
-
-
-    def build_next_generation(self, generation):
-        fitnesses = [shape.fittness for shape in generation]
-        fitness_sum = sum(fitnesses)
-        normalized_fittness = [fitness/fitness_sum for fitness in fitnesses]
-        print(normalized_fittness)
-        
-        next_generation = []
-
-        for _ in range(len(generation)-1):
-            try:
-                shape1 = np.random.choice(generation, p=normalized_fittness)
-                shape2 = np.random.choice(generation, p=normalized_fittness)
-            except ValueError as e:
-                messagebox.showerror('error', e)
-                raise
-            pairing_algorithm = random.choice([algorithm for algorithm in self.pairing_algorithms if algorithm.activated])
-            new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
-            next_generation.append(new_shape)
-        next_generation.append(np.random.choice(generation, p=normalized_fittness))
-        return next_generation
         
 
     def generate_first_generation(self): #fills the first array of self.generations with random shapes
