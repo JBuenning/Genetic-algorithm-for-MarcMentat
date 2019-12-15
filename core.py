@@ -68,6 +68,7 @@ class Core:
             raise NoMentatConnectionException
 
         if not self.generations:
+            self.evaluate_shapes([self.inital_shape])
             self.generate_first_generation()
             self.improvement_history.clear()
 
@@ -133,7 +134,7 @@ class Core:
     def default_settings(self):
         """Sets the settings of itself to the default settings
         """
-        self.first_generation_size = 25
+        self.first_generation_size = 3
 
     def mutate_shape(self,algorithm):
         pass

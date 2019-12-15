@@ -250,13 +250,16 @@ class Startpage(tk.PanedWindow):
         return markercolors
     
     def show_improvement_history(self,improvement_history):
+        inital_fittness = self.core.inital_shape.fittness
         generation_nums = [line[0] for line in improvement_history]
         fittness_means = [line[2] for line in improvement_history]
         fittness_min = [line[4]for line in improvement_history]
         fittness_max = [line[3]for line in improvement_history]
-        print(improvement_history)
-        self.plot_graph(generation_nums,fittness_means)
-        self.plot_graph.fill_between(generation_nums,fittness_min,fittness_max,color='blue',alpha=0.2)
+        self.graph_plot.clear()
+        self.graph_plot.hlines(inital_fittness,0,len(self.core.generations)-1)
+        self.graph_plot.plot(generation_nums,fittness_means)
+        self.graph_plot.fill_between(generation_nums,fittness_min,fittness_max,color='blue',alpha=0.2)
+        self.plot_canvas.draw()
         
     def draw_shape_comparison(self, shp, comparison_shape, autoscale):
         
