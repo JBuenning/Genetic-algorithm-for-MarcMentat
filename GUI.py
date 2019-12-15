@@ -166,7 +166,7 @@ class Startpage(tk.PanedWindow):
 
         #plot box
         f = matplotlib.figure.Figure()
-        self.plot = f.add_subplot(111)
+        self.graph_plot = f.add_subplot(111)
         self.plot_canvas = FigureCanvasTkAgg(f, plot_box)
         self.plot_canvas.draw()
         toolbar = NavigationToolbar2Tk(self.plot_canvas, plot_box)
@@ -217,6 +217,7 @@ class Startpage(tk.PanedWindow):
             thread.start()
             self.start_optimization_button.config(text='stop optimization')
         else:
+            self.show_improvement_history(self.core.improvement_history)
             self.start_optimization_button.config(text='start optimization')
 
         
@@ -224,8 +225,8 @@ class Startpage(tk.PanedWindow):
     def plot_graph(self, *args, **options):
         '''works exactly like matplotlib.pyplot.plot()'''
 
-        self.plot.clear()
-        self.plot.plot(*args, **options)
+        self.graph_plot.clear()
+        self.graph_plot.plot(*args, **options)
 
     def draw_shape_background(self,shp,markers=False,color='red'):
         self.shape_plot.plot(*shp.exterior.xy, color=color)
@@ -254,6 +255,15 @@ class Startpage(tk.PanedWindow):
                 markercolors.append('black')
         markercolors.append(markercolors[0])
         return markercolors
+    
+    def show_improvement_history(self,improvement_history):
+        generation_nums = [line[0] for line in improvement_history]
+        fittness_means = [line[2] for line in improvement_history]
+        fittness_min = [line[4]for line in improvement_history]
+        fittness_max = [line[3]for line in improvement_history]
+        print(improvement_history)
+        self.plot_graph(generation_nums,fittness_means)
+        self.graph_plot.fill_between(generation_nums,fittness_min,fittness_max,color='blue',alpha=0.2)
         
     def draw_shape_comparison(self, shp, comparison_shape, autoscale):
         

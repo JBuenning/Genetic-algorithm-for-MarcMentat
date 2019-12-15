@@ -12,12 +12,15 @@ import socket
 import pickle
 import threading
 import numpy as np
+import math
+import statistics as stat
 
 class Core:
     def __init__(self):
         self.lock = threading.Lock()
         self.optimization_running = False
         self.generations = [] #list with all generations, generation[0] is the inital generation
+        self.improvement_history = []
         self.inital_shape = None #Shape that the user wants to improve
         self.mutation_algorithms = mutation_algorithms.get_all_mutation_algorithms()
         self.pairing_algorithms = pairing_algorithms.get_all_pairing_algorithms()
@@ -66,12 +69,23 @@ class Core:
 
         if not self.generations:
             self.generate_first_generation()
+            self.improvement_history.clear()
 
         while self.optimization_running:
-            print('laenge of gernerations ',len(self.generations))
-            self.evaluate_shapes(self.generations[-1])
-            self.generations.append(self.build_next_generation(self.generations[-1]))
-            
+            generation = self.generations[-1]
+            self.evaluate_shapes(generation)
+            self.save_improvement(generation,self.generations.index(generation))
+            self.generations.append(self.build_next_generation(generation))
+
+    def save_improvement(self,generation,gen_num):
+        fittnesses = []
+        for shp in generation:
+            fittnesses.append(shp.fittness)
+        mean_fittness = stat.mean(fittnesses)
+        max_fittness = max(fittnesses)
+        min_fittness = min(fittnesses)
+        self.improvement_history.append([gen_num,fittnesses,mean_fittness,max_fittness,min_fittness])
+
 
 
     def build_next_generation(self, generation):
@@ -79,15 +93,16 @@ class Core:
         fitness_sum = sum(fitnesses)
         normalized_fittness = [fitness/fitness_sum for fitness in fitnesses]
         print(normalized_fittness)
-        try:
-            shape1 = np.random.choice(generation, p=normalized_fittness)
-            shape2 = np.random.choice(generation, p=normalized_fittness)
-        except ValueError as e:
-            messagebox.showerror('error', e)
-            raise
+        
         next_generation = []
 
         for _ in range(len(generation)):
+            try:
+                shape1 = np.random.choice(generation, p=normalized_fittness)
+                shape2 = np.random.choice(generation, p=normalized_fittness)
+            except ValueError as e:
+                messagebox.showerror('error', e)
+                raise
             pairing_algorithm = random.choice([algorithm for algorithm in self.pairing_algorithms if algorithm.activated])
             new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
             next_generation.append(new_shape)
@@ -118,7 +133,7 @@ class Core:
     def default_settings(self):
         """Sets the settings of itself to the default settings
         """
-        self.first_generation_size = 5
+        self.first_generation_size = 4
 
     def mutate_shape(self,algorithm):
         pass
