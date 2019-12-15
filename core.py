@@ -93,15 +93,16 @@ class Core:
         fitness_sum = sum(fitnesses)
         normalized_fittness = [fitness/fitness_sum for fitness in fitnesses]
         print(normalized_fittness)
-        try:
-            shape1 = np.random.choice(generation, p=normalized_fittness)
-            shape2 = np.random.choice(generation, p=normalized_fittness)
-        except ValueError as e:
-            messagebox.showerror('error', e)
-            raise
+        
         next_generation = []
 
         for _ in range(len(generation)):
+            try:
+                shape1 = np.random.choice(generation, p=normalized_fittness)
+                shape2 = np.random.choice(generation, p=normalized_fittness)
+            except ValueError as e:
+                messagebox.showerror('error', e)
+                raise
             pairing_algorithm = random.choice([algorithm for algorithm in self.pairing_algorithms if algorithm.activated])
             new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
             next_generation.append(new_shape)
@@ -132,7 +133,7 @@ class Core:
     def default_settings(self):
         """Sets the settings of itself to the default settings
         """
-        self.first_generation_size = 5
+        self.first_generation_size = 4
 
     def mutate_shape(self,algorithm):
         pass
