@@ -210,11 +210,20 @@ class Startpage(tk.PanedWindow):
 #         self.mentat_commandlist = Mentat_commandlist(marcMentat_commands)
 #         self.mentat_commandlist.pack(fill=tk.BOTH, expand=True)
 
+    def update_progress(self):
+        while self.core.optimization_running:
+            time.sleep(1)
+            self.show_improvement_history(self.core.improvement_history)
+            self.draw_shape_foreground(self.core.find_best_shape)
+
+
     def optimization_button_pressed(self):
         self.core.set_optimization_running(not self.core.get_optimization_running())
         if self.core.get_optimization_running():
-            thread = threading.Thread(target=self.core.start_optimization)
-            thread.start()
+            thread1 = threading.Thread(target=self.core.start_optimization)
+            thread1.start()
+            # thread2 = threading.Thread(target=self.update_progress)
+            # thread2.start()
             self.start_optimization_button.config(text='stop optimization')
         else:
             self.show_improvement_history(self.core.improvement_history)
