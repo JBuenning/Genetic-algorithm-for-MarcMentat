@@ -53,9 +53,9 @@ class Core:
                 elif best_shape[0].fittness != None and shp.fittness == best_shape[0].fittness:
                     best_shape.append(shp)
 
-    def set_optimization_running(self, running: bool):
+    def terminate_optimization(self):
         with self.lock:
-            self.optimization_running = running
+            self.optimization_running = False
 
     def get_optimization_running(self):
         with self.lock:
@@ -66,26 +66,34 @@ class Core:
 
     def start_optimization(self):
         print('start optimization')
-        if not [algorithm for algorithm in self.mutation_algorithms if algorithm.activated]:
-            messagebox.showerror('error', 'no active mutation algorithm')
-            raise MissingAlgorithmException('no activated mutation algorithm')
-        if not [algorithm for algorithm in self.pairing_algorithms if algorithm.activated]:
-            messagebox.showerror('error', 'no active pairing algorithm')
-            raise MissingAlgorithmException('no activated pairing algorithm')
-        if not self.mentat_connections:
-            messagebox.showerror('error', 'no Mentat instance connected.')
-            raise NoMentatConnectionException
+        self.optimization_running = True
+        try:
+            if not [algorithm for algorithm in self.mutation_algorithms if algorithm.activated]:
+                raise MissingAlgorithmException('no activated mutation algorithm')
+            if not [algorithm for algorithm in self.pairing_algorithms if algorithm.activated]:
+                raise MissingAlgorithmException('no activated pairing algorithm')
+            if not self.mentat_connections:
+                raise NoMentatConnectionException('no Mentat instance connected')
 
-        if not self.generations:
-            self.evaluate_shapes([self.inital_shape])
-            self.generate_first_generation()
-            self.improvement_history.clear()
+            if not self.generations:
 
-        while self.optimization_running:
-            generation = self.generations[-1]
-            self.evaluate_shapes(generation)
-            self.save_improvement(generation,self.generations.index(generation))
-            self.generations.append(self.build_next_generation(generation))
+                if not self.inital_shape:
+                    raise MissingInitialShapeException('no initial shape')
+
+                self.evaluate_shapes([self.inital_shape])
+                self.generate_first_generation()
+                self.improvement_history.clear()
+
+            while self.get_optimization_running():
+                generation = self.generations[-1]
+                self.evaluate_shapes(generation)
+                self.save_improvement(generation,self.generations.index(generation))
+                next_generation = self.build_next_generation(generation)
+                self.generations.append(next_generation)
+        except Exception as e:#maybe better to be more precise
+            messagebox.showerror('error', e)
+        finally:
+            self.optimization_running = False
 
     def save_improvement(self,generation,gen_num):
         fittnesses = []
@@ -113,7 +121,12 @@ class Core:
             except ValueError as e:
                 messagebox.showerror('error', e)
                 raise
-            pairing_algorithm = random.choice([algorithm for algorithm in self.pairing_algorithms if algorithm.activated])
+            activated_pairing_algorithms = [algorithm for algorithm in self.pairing_algorithms if algorithm.activated]
+
+            if not activated_pairing_algorithms:
+                raise MissingAlgorithmException('no pairing algorithm selected.')
+
+            pairing_algorithm = random.choice(activated_pairing_algorithms)
             new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
             next_generation.append(new_shape)
         next_generation.append(np.random.choice(generation, p=normalized_fittness))
@@ -128,10 +141,11 @@ class Core:
         self.generations = []#maybe bad
         generation = []
         activated_mutation_algorithms = [algorithm for algorithm in self.mutation_algorithms if algorithm.activated]
+        if not activated_mutation_algorithms:
+            raise MissingAlgorithmException('no mutation algorithm selected.')
 
         if not self.inital_shape:
-            messagebox.showerror('error', 'no initial shape')
-            raise MissingInitialShapeException
+            raise MissingInitialShapeException('no initial shape')
 
         else:
             for _ in range(self.first_generation_size):
@@ -195,7 +209,7 @@ class Core:
         for evaluation in tasklist.evaluations:#test if tasklist was completely evaluated
             if isinstance(evaluation, str):
                 print('wrong tasklist', tasklist.evaluations)
-                raise Exception('tasklist not evaluated correctly')
+                raise NoMentatConnectionException('tasklist not evaluated correctly,\nprobably because no Mentat instance is connected.')
         
         print('the evaluation took {} seconds'.format(time.time()-start_time))
         print('the evaluation list: ', tasklist.evaluations)

@@ -1,5 +1,11 @@
-wenn man auf start optimization klickt und ein Fehler entsteht der verhindert, dass die optimization nicht gestartet wird switcht der button trotzdem zu 'stop optimization'
+1. wenn man auf start optimization klickt und ein Fehler entsteht der verhindert, dass die optimization nicht gestartet wird switcht der button trotzdem zu 'stop optimization'
 
-fatal exception on one of the connections with mentat -> führt nicht zum rausschmiss dieser mentat connection
+2. fatal exception on one of the connections with mentat -> führt nicht zum rausschmiss dieser mentat connection
 
-bei stop optimization muss die gerade verwendete generation verworfen werden und dirket gestoppt werden das ist sonst unpraktisch wenn man stoppen will und noch ne stunde warten muss weil die letzte generation gerade läuft
+3. bei stop optimization muss die gerade verwendete generation verworfen werden und dirket gestoppt werden das ist sonst unpraktisch wenn man stoppen will und noch ne stunde warten muss weil die letzte generation gerade läuft
+
+zu 1) gelöst, egal welcher Fehler passiert: Der Fehler wird als message ausgeprinted und der Button zurückgesetzt
+zu 3) würde ich erst mal nicht machen. Das Problem ist, dass die einlese- und evaluierscripte nicht abgebrochen werden können.
+    Das heißt, es gäbe ganz böse Fehler, wenn man dann relativ schnell wieder auf Start drückt. Um das zu ändern, müsste man die ganze Struktur
+    vom Einlesen ändern. Im Moment können die Scripte nämlich nur Daten empfangen, wenn sie grade nicht einlesen. Können wir aber später ändern.
+    Im Moment habe ich einfach auf den Button eine Sinnvolle Nachricht geschrieben, solange er den Prozess abbicht.

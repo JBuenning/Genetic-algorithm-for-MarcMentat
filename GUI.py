@@ -218,16 +218,25 @@ class Startpage(tk.PanedWindow):
 
 
     def optimization_button_pressed(self):
-        self.core.set_optimization_running(not self.core.get_optimization_running())
-        if self.core.get_optimization_running():
+        #self.core.set_optimization_running(not self.core.get_optimization_running())
+        if not self.core.get_optimization_running():
             thread1 = threading.Thread(target=self.core.start_optimization)
+            thread2 = threading.Thread(target=lambda: self.listen_for_optimization_loop_terminating(thread1))
             thread1.start()
-            # thread2 = threading.Thread(target=self.update_progress)
-            # thread2.start()
+            thread2.start()
+
+            # thread3 = threading.Thread(target=self.update_progress)
+            # thread3.start()
             self.start_optimization_button.config(text='stop optimization')
         else:
+            self.core.terminate_optimization()
+            self.start_optimization_button.config(state='disabled', text='stopping optimization...')
             self.show_improvement_history(self.core.improvement_history)
-            self.start_optimization_button.config(text='start optimization')
+            #self.start_optimization_button.config(text='start optimization')
+
+    def listen_for_optimization_loop_terminating(self, loop_thread):
+        loop_thread.join()
+        self.start_optimization_button.config(text='start optimization', state='normal')
 
 
     def draw_shape_background(self,shp,markers=False,color='red'):
