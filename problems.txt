@@ -4,6 +4,10 @@
 
 3. bei stop optimization muss die gerade verwendete generation verworfen werden und dirket gestoppt werden das ist sonst unpraktisch wenn man stoppen will und noch ne stunde warten muss weil die letzte generation gerade läuft
 
+4. Ich glaube, wir müssen dem Core die Möglichkeit geben, Dinge auf der Gui zu zeichnen. Alles andere macht denke ich keinen Sinn.
+    Wir müssen dem core ja nicht die ganze Gui mitgeben, es reicht ja vielleicht, wenn wir ihm nur ein paar grafische Elemente geben, z.B.
+    also die Fenster mit Shape und plot und eine Statusleiste oder so.
+
 zu 1) gelöst, egal welcher Fehler passiert: Der Fehler wird als message ausgeprinted und der Button zurückgesetzt
 zu 3) würde ich erst mal nicht machen. Das Problem ist, dass die einlese- und evaluierscripte nicht abgebrochen werden können.
     Das heißt, es gäbe ganz böse Fehler, wenn man dann relativ schnell wieder auf Start drückt. Um das zu ändern, müsste man die ganze Struktur
