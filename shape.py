@@ -131,15 +131,25 @@ def get_distance(point1,point2):
     return math.sqrt(math.pow(dx,2)+math.pow(dy,2))
 
 def get_lines(obj):
-    if type(obj) == geometry.LineString:
+    """Returns all the the lines of an object that represents a geometry
+    
+    Args:
+        obj (list,LineString,Polygon or Shape): Must contain exterior coordinates
+    
+    Returns:
+        list: A list of tuples that represent coordinates
+    """
+    if isinstance(obj,geometry.LineString):
         coords = list(obj.coords)
-    else: #anpassen dass es auf typ shape prüft
-        coords = obj.exterior.coords[:-1]
+    elif isinstance(obj,Shape) or isinstance(obj,geometry.Polygon):
+        coords = list(obj.exterior.coords)
+    elif isinstance(obj,list):
+        coords = obj
+
     lines = []
     for i in range(1,len(coords)):
         lines.append([coords[i-1],coords[i]])
-    if type(obj) != geometry.LineString:#statt Line String auf shape prüfen ganz wichtig!!! Jonas fragen 
-        lines.append([coords[len(coords)-1],coords[0]])
+
     return lines
 
 def shortest_line(shape,data_type):#data_type - l gibt line zurück, v den wert
