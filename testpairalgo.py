@@ -1,6 +1,7 @@
 from shapely import geometry
 import tkinter as tk
 import time
+import shape
 import examples
 from algorithms import mutation_algorithms
 import core
@@ -17,7 +18,13 @@ p2= c.generations[0][1]
 
 def pair_shapes(shp1, shp2):
     def pair_two_sections(sections):
-        section=None
+        coords_num = max(len(sections[0]),len(sections[1]))
+        coords_compare = []
+        section=[]
+        for i in range(2):
+            coords_compare.append(shape.get_even_spreaded_points(sections[i],coords_num))#ahhhhhhhhhhh
+        for i in range(coords_num):
+            section.append(shape.point_between_points(coords_compare[0][i],coords_compare[1][i]))
         return sections
 
     shps = [shp1,shp2]
@@ -72,10 +79,9 @@ def pair_shapes(shp1, shp2):
 a = pair_shapes(p1,p2)
 
 
-for b in a:
-    print(b)
-    plt.plot(*p1.exterior.xy,color='blue',marker='o')
-    plt.plot(*p2.exterior.xy,color='yellow',marker='o')
-    plt.plot(*zip(*b[0]),color='black',marker='x')
-    plt.plot(*zip(*b[1]),color='red',marker='x')
-    plt.show()
+
+plt.plot(*p1.exterior.xy,color='blue',marker='o')
+plt.plot(*p2.exterior.xy,color='yellow',marker='o')
+# plt.plot(*zip(*b[0]),color='black',marker='x')
+plt.plot(*zip(*a),color='red',marker='x')
+plt.show()

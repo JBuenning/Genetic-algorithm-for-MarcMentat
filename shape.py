@@ -73,7 +73,7 @@ def get_even_spreaded_points(obj,*args):
             shp_l = shp.length/coords_num
         i = 0
         left = 0
-        for j in range(coords_num):
+        for _ in range(coords_num):
             distance = get_distance(shp_lines[i][0],shp_lines[i][1])# hier muss umgebaut werden vllt die for zur while shleife machen und immer wieder i kontrollieren
             if distance+left > shp_l:
                 distance_on_line = shp_l-left

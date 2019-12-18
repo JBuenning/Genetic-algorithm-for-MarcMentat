@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 a = geometry.LineString([(0,0),(0,2)])
 c = shape.Shape([(0,0),(0,1),(1,1),(1,0)])
 
-b = shape.get_even_spreaded_points(a,3)
+b = shape.get_even_spreaded_points(a,5)
 
 plt.plot(*a.xy,color='red',marker='o')
 plt.plot(*zip(*b),color='blue',marker='o')
