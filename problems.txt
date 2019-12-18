@@ -1,15 +1,21 @@
-1. wenn man auf start optimization klickt und ein Fehler entsteht der verhindert, dass die optimization nicht gestartet wird switcht der button trotzdem zu 'stop optimization'
+Gelöste Probleme
+1.  wenn man auf start optimization klickt und ein Fehler entsteht der verhindert, dass die optimization nicht gestartet wird switcht der button trotzdem zu 'stop optimization'
+        J-> gelöst, egal welcher Fehler passiert: Der Fehler wird als message ausgeprinted und der Button zurückgesetzt
 
-2. fatal exception on one of the connections with mentat -> führt nicht zum rausschmiss dieser mentat connection
+Akkute Probleme
+2.  fatal exception on one of the connections with mentat -> führt nicht zum rausschmiss dieser mentat connection
 
-3. bei stop optimization muss die gerade verwendete generation verworfen werden und dirket gestoppt werden das ist sonst unpraktisch wenn man stoppen will und noch ne stunde warten muss weil die letzte generation gerade läuft
-
-4. Ich glaube, wir müssen dem Core die Möglichkeit geben, Dinge auf der Gui zu zeichnen. Alles andere macht denke ich keinen Sinn.
+4.  Ich glaube, wir müssen dem Core die Möglichkeit geben, Dinge auf der Gui zu zeichnen. Alles andere macht denke ich keinen Sinn.
     Wir müssen dem core ja nicht die ganze Gui mitgeben, es reicht ja vielleicht, wenn wir ihm nur ein paar grafische Elemente geben, z.B.
     also die Fenster mit Shape und plot und eine Statusleiste oder so.
 
-zu 1) gelöst, egal welcher Fehler passiert: Der Fehler wird als message ausgeprinted und der Button zurückgesetzt
-zu 3) würde ich erst mal nicht machen. Das Problem ist, dass die einlese- und evaluierscripte nicht abgebrochen werden können.
-    Das heißt, es gäbe ganz böse Fehler, wenn man dann relativ schnell wieder auf Start drückt. Um das zu ändern, müsste man die ganze Struktur
-    vom Einlesen ändern. Im Moment können die Scripte nämlich nur Daten empfangen, wenn sie grade nicht einlesen. Können wir aber später ändern.
-    Im Moment habe ich einfach auf den Button eine Sinnvolle Nachricht geschrieben, solange er den Prozess abbicht.
+Aufgeschobene Probleme
+3. bei stop optimization muss die gerade verwendete generation verworfen werden und dirket gestoppt werden das ist sonst unpraktisch wenn man stoppen will und noch ne stunde warten muss weil die letzte generation gerade läuft
+    J-> würde ich erst mal nicht machen. Das Problem ist, dass die einlese- und evaluierscripte nicht abgebrochen werden können.
+        Das heißt, es gäbe ganz böse Fehler, wenn man dann relativ schnell wieder auf Start drückt. Um das zu ändern, müsste man die ganze Struktur
+        vom Einlesen ändern. Im Moment können die Scripte nämlich nur Daten empfangen, wenn sie grade nicht einlesen. Können wir aber später ändern.
+        Im Moment habe ich einfach auf den Button eine Sinnvolle Nachricht geschrieben, solange er den Prozess abbicht.
+    T-> ja seh ich ein, dass das erstmal nicht machbar ist, aber so generell sollte das irgendwann möglich sein finde ich
+        stell dir vor du startest eine richtige Optimierung also mit einer großen ersten Generation 
+        und hast eine Einstellung falsch, dann musst du erstmal Stunden warten bis die erste Generation evaluiert wurde,
+        oder du killst alle Mentat Verbindungen und musst die alle neu starten was auch ätzend ist wenn man bedenkt, dass man ja super viele Mentats verbunden haben kann
