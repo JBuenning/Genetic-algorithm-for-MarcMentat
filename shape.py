@@ -48,29 +48,29 @@ class Shape(geometry.Polygon):
         #object.area
         #...
 
-def get_even_spreaded_points(obj,*args):
-        if type(obj) == list:
-            shp = geometry.LineString(obj)
-        # elif type(obj) !=  geometry.LineString and type(obj) != shape: #Fehler bei shape
-            # print('get_even_spreaded_points called with not suitable object')
-        else:#notlösung
-            shp = obj
-            coords_num = -1
+def get_even_spreaded_points(obj,**kwargs):
+        if isinstance(obj,list):
+            length = geometry.LineString(obj).length
+            round_geom = False
+        elif isinstance(obj,Shape) or isinstance(obj,geometry.Polygon):
+            length = obj.exterior.length
+            round_geom = True
+        elif isinstance(obj,geometry.LineString):
+            length = obj.length
+            round_geom = False
+        
+        shp_lines = get_lines(obj)
+
+        if kwargs.get('coords_num'):
+            coords_num = kwargs.get('coords_num')
+            if not round_geom:
+                coords_num += -1
+        else:
+            coords_num = len(shp_lines)
+
+        shp_l = length/coords_num
 
         shp_coords_compare = []
-        
-        shp_lines = get_lines(shp) # anpassen was passiert wenn shp linestring ist- methode anpassen
-        
-        if args:
-            coords_num=args[0]
-        else:
-            coords_num+=len(shp_lines)+1
-
-        if type(obj)==geometry.LineString:
-            shp_l = shp.length/(coords_num-1)
-            shp_coords_compare.append(shp_lines[0][0])
-        else:#notlösung
-            shp_l = shp.length/coords_num
         i = 0
         left = 0
         for _ in range(coords_num):
