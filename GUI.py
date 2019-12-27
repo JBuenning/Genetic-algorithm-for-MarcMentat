@@ -328,27 +328,37 @@ class MarcMentatPage(tk.Frame):
         middlebox.pack(side=tk.BOTTOM, fill=tk.X)
         tk.Label(middlebox, text='Host').grid(row=0, sticky=tk.W)
         self.entry_host = tk.Entry(middlebox)
-        self.entry_host.bind('<Return>',lambda event: self.add_item())
+        self.entry_host.bind('<Return>',lambda event: self.add_items())
         self.entry_host.grid(row=1)
         tk.Label(middlebox, text='Port').grid(row=0, column=1, sticky=tk.W)
         self.entry_port = tk.Entry(middlebox)
-        self.entry_port.bind('<Return>',lambda event: self.add_item())
+        self.entry_port.bind('<Return>',lambda event: self.add_items())
         self.entry_port.grid(row=1, column=1)
-        add_item = ttk.Button(middlebox, text='add connection', command=self.add_item)
-        add_item.grid(row=1, column=2, padx=4)
+        add_connection_button = ttk.Button(middlebox, text='add connection', command=self.add_items)
+        add_connection_button.grid(row=1, column=2, padx=4)
 
-    def add_item(self):
+    def add_items(self):
+        def help(self,host,port):
+            if host:
+                try:
+                    int(port)
+                    self.listbox.insert(tk.END, 'HOST "{}", PORT {}'.format(host, port))
+                    self.core.mentat_connections.append((host,int(port)))
+                    #self.entry_host.delete(0,'end')
+                    self.entry_port.delete(0,'end')
+                except:
+                    pass
+
         host = self.entry_host.get()
-        port = self.entry_port.get()
-        if host:
-            try:
-                int(port)
-                self.listbox.insert(tk.END, 'HOST "{}", PORT {}'.format(host, port))
-                self.core.mentat_connections.append((host,int(port)))
-                #self.entry_host.delete(0,'end')
-                self.entry_port.delete(0,'end')
-            except:
-                pass
+        ports = self.entry_port.get()
+        if '-' in ports:
+            range_ = [int(port) for port in ports.split('-')]
+            range_.sort()
+            range_[-1]+=1
+            for port in range(*range_):
+                help(self,host,port)
+        else:
+            help(self,host,int(ports))
 
     def test_all(self):
         i = 0
