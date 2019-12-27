@@ -338,7 +338,7 @@ class MarcMentatPage(tk.Frame):
         add_connection_button.grid(row=1, column=2, padx=4)
 
     def add_items(self):
-        def help(self,host,port):
+        def add_item(self,host,port):
             if host:
                 try:
                     int(port)
@@ -351,14 +351,19 @@ class MarcMentatPage(tk.Frame):
 
         host = self.entry_host.get()
         ports = self.entry_port.get()
-        if '-' in ports:
-            range_ = [int(port) for port in ports.split('-')]
+        split_chars = ['-',' bis ',' until ']
+        split_char = None
+        for char in split_chars:
+            if char in ports:
+                split_char = char
+        if split_char:
+            range_ = [int(port) for port in ports.split(split_char)]
             range_.sort()
             range_[-1]+=1
             for port in range(*range_):
-                help(self,host,port)
+                add_item(self,host,port)
         else:
-            help(self,host,int(ports))
+            add_item(self,host,int(ports))
 
     def test_all(self):
         i = 0
