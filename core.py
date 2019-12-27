@@ -114,7 +114,7 @@ class Core:
         
         next_generation = []
 
-        for _ in range(len(generation)-5):
+        for _ in range(len(generation)):
             try:
                 shape1 = np.random.choice(generation, p=normalized_fittness)
                 shape2 = np.random.choice(generation, p=normalized_fittness)
@@ -126,15 +126,17 @@ class Core:
             if not activated_pairing_algorithms:
                 raise MissingAlgorithmException('no pairing algorithm selected.')
 
-            pairing_algorithm = random.choice(activated_pairing_algorithms)
-            new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
+            new_shape = None
+            while not new_shape:# possible endless loop when no algorithm is working
+                pairing_algorithm = random.choice(activated_pairing_algorithms)
+                new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
             next_generation.append(new_shape)
-        next_generation.append(np.random.choice(generation, p=normalized_fittness))
-        next_generation.append(np.random.choice(generation, p=normalized_fittness))
-        algorithm = self.mutation_algorithms[0]
-        next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
-        next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
-        next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
+        # next_generation.append(np.random.choice(generation, p=normalized_fittness))
+        # next_generation.append(np.random.choice(generation, p=normalized_fittness))
+        # algorithm = self.mutation_algorithms[0]
+        # next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
+        # next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
+        # next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
         return next_generation
         
 
@@ -162,7 +164,7 @@ class Core:
     def default_settings(self):
         """Sets the settings of itself to the default settings
         """
-        self.first_generation_size = 40
+        self.first_generation_size = 5
 
     def mutate_shape(self,algorithm):
         pass
