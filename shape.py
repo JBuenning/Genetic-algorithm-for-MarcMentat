@@ -291,6 +291,15 @@ def csv_to_shape(file_path):
         coords = []
         next(csv_reader,None)
         for line in csv_reader:
+            coords.append((float(line[0]),float(line[1])))
+        return Shape(coords)
+
+def imagej_to_shape(file_path):
+    with open(file_path,'r') as file:
+        csv_reader = csv.reader(file)
+        coords = []
+        next(csv_reader,None)
+        for line in csv_reader:
             coords.append((float(line[5]),float(line[6])))
         return Shape(coords)
 

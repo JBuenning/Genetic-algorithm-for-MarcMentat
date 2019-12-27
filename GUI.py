@@ -541,7 +541,7 @@ if __name__=='__main__':
     dname = os.path.dirname(abspath)
     os.chdir(dname)
     gui = GUI()
-    gui.core.inital_shape=shape.csv_to_shape('small_penis.csv')
+    gui.core.inital_shape=shape.csv_to_shape('wuerfel.csv')
 
     # gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
     # gui.core.generate_first_generation()
