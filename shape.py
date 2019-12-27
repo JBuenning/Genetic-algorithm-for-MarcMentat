@@ -304,6 +304,8 @@ def imagej_to_shape(file_path):
         return Shape(coords)
 
 
+
+
     
 #shell - Liste mit tuples (Koordinaten)
 #move_restrictions - gleiche länge wie shell
@@ -338,7 +340,13 @@ class Shape(geometry.Polygon):
             if smallest_distance_point_shape(point,self,True)[0] < limit:
                 return False
         return True
-        
+
+    def check_shape(self):
+        if not self.is_valid or not self.is_simple:
+            return False
+        else:
+            return True
+            
         
         #einige Methoden und Attribute, die schon da sind:
             
