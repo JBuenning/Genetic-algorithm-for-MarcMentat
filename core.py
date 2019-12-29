@@ -46,12 +46,17 @@ class Core:
 
     def find_best_shape(self):
         best_shape = []
+        print('heya')
         for generation in self.generations:
             for shp in generation:
-                if not best_shape or shp.fittness > best_shape[0].fittness:
+                if not best_shape:
                     best_shape.append(shp)
+                elif shp.fittness:
+                    if shp.fittness > best_shape[0].fittness:
+                        best_shape.append(shp)
                 elif best_shape[0].fittness != None and shp.fittness == best_shape[0].fittness:
                     best_shape.append(shp)
+        return best_shape[0]
 
     def terminate_optimization(self):
         with self.lock:
@@ -103,21 +108,65 @@ class Core:
         max_fittness = max(fittnesses)
         min_fittness = min(fittnesses)
         self.improvement_history.append([gen_num,fittnesses,mean_fittness,max_fittness,min_fittness])
+    
+    @staticmethod
+    def normalize_fittness(fitnesses,settings):
+        def mapper(fnc):
+            def inner(lst):
+                return [fnc(val) for val in lst]
+            return inner
+        @mapper
+        def exp(val):
+            return val+math.exp(2*val-1.5)-0.2
+        @mapper
+        def linear(val):
+            return 2*val-0.1
+        def normalize(lst):
+            fitness_sum = sum(lst)
+            return [fitness/fitness_sum for fitness in lst]
+        def shift(lst):
+            max_ = max(lst)
+            return [val/max_ for val in lst]
+        @mapper
+        def invert_value(val):
+            return -val+1
 
 
+
+
+        local_settings = {'fnc_type':None,
+                            'invert':False}
+
+        # hier muss dringend die GUI verknüpft werden, sodass die man auch dort diese Einstellungen vornehmen kann und 
+        for key in local_settings:
+            try:
+                local_settings[key] = settings.get(key) # verknüpfung sollte später so aussehen dass die GUI sich die default values vom evaluation algorithm holt und an diesr stelle nur die GUI ausgelesen wird 
+            except:
+                pass
+        fncs = {'linear':linear,
+                'exponential':exp}
+
+        results = normalize(fitnesses)
+        if local_settings['invert']:
+            results = invert_value(results)
+            results = normalize(results)
+        if local_settings['fnc_type']:
+            fnc = fncs.get(local_settings['fnc_type'])
+            results = shift(results)
+            results = fnc(results)
+            results = normalize(results)
+        return results
 
     def build_next_generation(self, generation):
         fitnesses = [shape.fittness for shape in generation]
-        fitness_sum = sum(fitnesses)
-        normalized_fittness = [fitness/fitness_sum for fitness in fitnesses]
-        print(normalized_fittness)
+        normalized_fittnesses = self.normalize_fittness(fitnesses,self.all_evaluation_algorithms[self.evaluation_algorithm].get_fitness_normalizing_settings())
+        print(normalized_fittnesses)
         
         next_generation = []
 
-        for _ in range(len(generation)):
+        for _ in range(len(generation)-5):
             try:
-                shape1 = np.random.choice(generation, p=normalized_fittness)
-                shape2 = np.random.choice(generation, p=normalized_fittness)
+                shape1,shape2 = tuple(np.random.choice(generation,size=2, p=normalized_fittnesses))
             except ValueError as e:
                 messagebox.showerror('error', e)
                 raise
@@ -131,12 +180,12 @@ class Core:
                 pairing_algorithm = random.choice(activated_pairing_algorithms)
                 new_shape = pairing_algorithm.pair_shapes(shape1,shape2)
             next_generation.append(new_shape)
-        # next_generation.append(np.random.choice(generation, p=normalized_fittness))
-        # next_generation.append(np.random.choice(generation, p=normalized_fittness))
-        # algorithm = self.mutation_algorithms[0]
-        # next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
-        # next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
-        # next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittness)))
+        next_generation.append(np.random.choice(generation, p=normalized_fittnesses))
+        next_generation.append(np.random.choice(generation, p=normalized_fittnesses))
+        algorithm = self.mutation_algorithms[0]
+        next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittnesses)))
+        next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittnesses)))
+        next_generation.append(algorithm.change_shape(np.random.choice(generation, p=normalized_fittnesses)))
         return next_generation
         
 
@@ -164,8 +213,7 @@ class Core:
     def default_settings(self):
         """Sets the settings of itself to the default settings
         """
-        self.first_generation_size = 5
-
+        self.first_generation_size = 45
     def mutate_shape(self,algorithm):
         pass
 

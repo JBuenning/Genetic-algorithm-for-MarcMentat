@@ -1,2 +1,3 @@
-for i in range(20,0):
-    print(i)
+a = {'a':1}
+
+print(a['b'])

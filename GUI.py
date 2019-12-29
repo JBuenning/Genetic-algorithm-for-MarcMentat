@@ -213,8 +213,10 @@ class Startpage(tk.PanedWindow):
     def update_progress(self):
         while self.core.optimization_running:
             time.sleep(1)
-            self.show_improvement_history(self.core.improvement_history)
-            self.draw_shape_foreground(self.core.find_best_shape)
+            self.show_improvement_history(self.core.improvement_history())
+            self.shape_canvas.clear()
+            self.draw_shape_foreground(self.core.find_best_shape())
+            self.shape_canvas.draw()
 
 
     def optimization_button_pressed(self):
@@ -232,6 +234,9 @@ class Startpage(tk.PanedWindow):
             self.core.terminate_optimization()
             self.start_optimization_button.config(state='disabled', text='stopping optimization...')
             self.show_improvement_history(self.core.improvement_history)
+            self.shape_canvas.clear()
+            self.draw_shape_foreground(self.core.find_best_shape())
+            self.shape_canvas.draw()
             #self.start_optimization_button.config(text='start optimization')
 
     def listen_for_optimization_loop_terminating(self, loop_thread):
@@ -558,7 +563,9 @@ if __name__=='__main__':
     dname = os.path.dirname(abspath)
     os.chdir(dname)
     gui = GUI()
+    
     gui.core.inital_shape=shape.csv_to_shape('wuerfel.csv')
+    gui.pages['startpage'].draw_shape_foreground(gui.core.inital_shape)
 
     # gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
     # gui.core.generate_first_generation()

@@ -19,6 +19,9 @@ class Evaluation_algorithm:
     def get_name(self):
         raise NotImplementedError
 
+    def get_fitness_normalizing_settings(self):
+        return None
+
     def get_settings_frame(self, master):
         frame = tk.Frame()
         label = tk.Label(frame, text='no settings available')
@@ -42,6 +45,11 @@ class Min_stress_min_area(Evaluation_algorithm):
     def get_name(self):
         return 'min stress min area'
 
+    def get_fitness_normalizing_settings(self):
+        settings = {'invert':True,
+                    'fnc_type':'exponential'}
+        return settings
+
     def execute(self, shape_coords,shape_length, shape_area, py_mentat, py_post, connection):
         print('evaluating shape')
         py_mentat.py_send('*post_open_default')
@@ -49,14 +57,14 @@ class Min_stress_min_area(Evaluation_algorithm):
         py_mentat.py_send('*post_contour_bands')
         n_id = py_mentat.py_get_int("scalar_max_node()")
         max_von_mises_stress = py_mentat.py_get_float('scalar_1({})'.format(n_id))
-
+        print(max_von_mises_stress)
         if max_von_mises_stress:#check if something went wrong
             #print('the maximal Von Mises Stress is ', max_von_mises_stress)
-            result = 1/max_von_mises_stress#just for testing
+            result = max_von_mises_stress/shape_area#just for testing
         else:
             print('something went wrong')
             result = shape_area/shape_length
-            #result = -99999
+            result = -99999
 
         #......actual result must be calculated
 

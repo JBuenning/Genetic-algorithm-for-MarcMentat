@@ -3,11 +3,17 @@ Gelöste Probleme
         J-> gelöst, egal welcher Fehler passiert: Der Fehler wird als message ausgeprinted und der Button zurückgesetzt
 
 Akkute Probleme
+1. self.evaluation_algorithm is n String?
+
 2.  fatal exception on one of the connections with mentat -> führt nicht zum rausschmiss dieser mentat connection
+
+3. BooleanPairing gibt änder manchmal die Koordinatenanzahl
 
 4.  Ich glaube, wir müssen dem Core die Möglichkeit geben, Dinge auf der Gui zu zeichnen. Alles andere macht denke ich keinen Sinn.
     Wir müssen dem core ja nicht die ganze Gui mitgeben, es reicht ja vielleicht, wenn wir ihm nur ein paar grafische Elemente geben, z.B.
     also die Fenster mit Shape und plot und eine Statusleiste oder so.
+
+5. Idee: move restrictions können auch als fixed displacements angesehen werden wenn die entsprechende einstellung aktiviert ist
 
 Aufgeschobene Probleme
 3. bei stop optimization muss die gerade verwendete generation verworfen werden und dirket gestoppt werden das ist sonst unpraktisch wenn man stoppen will und noch ne stunde warten muss weil die letzte generation gerade läuft

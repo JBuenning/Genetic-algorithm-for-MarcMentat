@@ -5,6 +5,14 @@ import math
 import examples
 import csv
 
+def str_to_bool(str_):
+    if str_ == 'True':
+        return True
+    elif str_ == 'False':
+        return False
+    else:
+        return None
+
 def move_point(point, start, end, movement, restriction):
         sx, sy = start
         ex, ey = end
@@ -289,10 +297,16 @@ def csv_to_shape(file_path):
     with open(file_path,'r') as file:
         csv_reader = csv.reader(file)
         coords = []
+        forces = []
+        move_restrictions = []
+        fixed_displacements = []
         next(csv_reader,None)
         for line in csv_reader:
             coords.append((float(line[0]),float(line[1])))
-        return Shape(coords)
+            forces.append((float(line[2]),float(line[3])))
+            move_restrictions.append((not str_to_bool(line[4]),not str_to_bool(line[5])))
+            fixed_displacements.append(( str_to_bool(line[4]), str_to_bool(line[5])))
+        return Shape(coords,None,move_restrictions,fixed_displacements,forces)
 
 def imagej_to_shape(file_path):
     with open(file_path,'r') as file:
@@ -301,7 +315,7 @@ def imagej_to_shape(file_path):
         next(csv_reader,None)
         for line in csv_reader:
             coords.append((float(line[5]),float(line[6])))
-        return Shape(coords)
+        return Shape(coords,None,None,None,None)
 
 
 
@@ -309,7 +323,7 @@ def imagej_to_shape(file_path):
     
 #shell - Liste mit tuples (Koordinaten)
 #move_restrictions - gleiche länge wie shell
-    #Ture - darf sich bewegen 
+    #True - darf sich bewegen 
     #False - darf sich nicht bewegen
     #tuple - Vektor in welche Richtung Punkt sich bewegen darf
 #fixed_displacement - gleiche lände wie shell, enthält tuples mit x = True/False und y=True/False
@@ -320,7 +334,15 @@ class Shape(geometry.Polygon):
         if move_restrictions is None:
             self.move_restrictions = [False]*len(shell)
         else:
-            self.move_restrictions=move_restrictions
+            new_move_restrictions = []
+            for move_restriction in move_restrictions:
+                if isinstance(move_restriction,tuple) and  move_restriction[0] and  move_restriction[1]:
+                    new_move_restrictions.append(False)
+                elif isinstance(move_restriction,tuple) and  not move_restriction[0] and  not move_restriction[1]:
+                    new_move_restrictions.append(True)
+                else:
+                    new_move_restrictions.append(move_restriction)
+            self.move_restrictions=new_move_restrictions
 
         if fixed_displacements is None:
             self.fixed_displacements = [(False,False)]*len(shell)
