@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 import random
 from algorithms import algorithm
+import math
 
 def get_all_mutation_algorithms():
     """Returns an object of every mutation algorithm presen in this file
@@ -170,8 +171,9 @@ class AlgorithmTwo(MutationAlgorithm):
         self.max_radius = 20.0
         self.max_recursiondepth=20
         self.n_times = 20
+        self.editing_mode = 'smooth'
 
-    def set_default(self):# erklären lassen von jonas
+    def set_default(self):# button-click
         self.default_settings()
         self.ent_min_movement.delete(0,'end')
         self.ent_min_movement.insert(0, self.min_movement)
@@ -185,6 +187,7 @@ class AlgorithmTwo(MutationAlgorithm):
         self.ent_max_recursiondepth.insert(0, self.max_recursiondepth)
         self.ent_n_times.delete(0, 'end')
         self.ent_n_times.insert(0, self.n_times)
+        self.ent_editing_mode.current(0)
 
     def apply(self):
         try:
@@ -231,6 +234,8 @@ class AlgorithmTwo(MutationAlgorithm):
         except:
             self.ent_n_times.delete(0, 'end')
             self.ent_n_times.insert(0, self.n_times)
+        
+        self.editing_mode = self.ent_editing_mode.get()
 
     def get_settings_frame(self, master):
         frame = tk.Frame(master)
@@ -255,15 +260,121 @@ class AlgorithmTwo(MutationAlgorithm):
         tk.Label(frame, text='repetitions').grid(row=5, column=0, sticky='w')
         self.ent_n_times = tk.Entry(frame, width=5)
         self.ent_n_times.grid(row=5, column=1)
+        tk.Label(frame, text='editing mode').grid(row=6, column=0, sticky='w')
+        self.ent_editing_mode = tk.ttk.Combobox(frame, values=['smooth', 'linear', 'constant', 'sharp', 'root', 'sphere'], state='readonly')
+        self.ent_editing_mode.grid(row=6, column=1)
         apply = ttk.Button(frame, text='apply', command=self.apply)
-        apply.grid(row=6, column=0, pady=4)
+        apply.grid(row=7, column=0, pady=4)
         default = ttk.Button(frame, text='reset', command=self.set_default)
-        default.grid(row=6, column=1, pady=4)
+        default.grid(row=7, column=1, pady=4)
         self.set_default()
         return frame
 
     def change_shape(self, shp):
-        pass
+        
+        def help(shp, loop_counter=0):
+
+            #see https://blender.stackexchange.com/questions/98487/what-is-the-algorithm-behind-blenders-proportional-edit/98505
+            def linear(radius, distance):
+                return 1 - (distance/radius)
+
+            def constant(radius, distance):
+                return 1
+
+            def sharp(radius, distance):
+                return (1 - (distance/radius)) ** 2
+            
+            def root(radius, distance):
+                return math.sqrt(1 - (distance/radius))
+
+            def sphere(radius, distance):
+                return math.sqrt((1 - (distance/radius))*2 - (1 - (distance/radius))**2)
+
+            def smooth(radius, distance):
+                return 3*((1 - (distance/radius))**2) - 2*((1 - (distance/radius))**3)
+
+            if self.editing_mode == 'smooth':
+                falloff = smooth
+            elif self.editing_mode == 'sphere':
+                falloff = sphere
+            elif self.editing_mode == 'root':
+                falloff = root
+            elif self.editing_mode == 'sharp':
+                falloff = sharp
+            elif self.editing_mode == 'constant':
+                falloff = constant
+            elif self.editing_mode == 'linear':
+                falloff = linear
+
+            success = False
+
+            while not success:
+
+                coords = shp.exterior.coords[:-1]
+                movable_points = []
+                for i in range(len(coords)):
+                    if (not shp.move_restrictions[i]) or (type(shp.move_restrictions[i]) is tuple):
+                        movable_points.append(i)
+
+                choice = random.choice(movable_points)
+                radius = random.uniform(self.min_radius, self.max_radius)
+                movement = random.uniform(self.min_movement, self.max_movement) * random.choice([1, -1])
+
+                n1 = choice -1
+                if choice == len(coords)-1:
+                    n2 = 0
+                else:
+                    n2 += 1
+                new_point = shape.move_point(coords[choice], coords[n1], coords[n2], movement, shp.moverestrictions[choice])
+                movement_x = new_point[0] - coords[choice][0]
+                movement_y = new_point[1] - coords[choice][1]
+                coords[choice] = new_point
+
+                #positive
+                if choice == len(coords)-1:
+                    target = 0
+                else:
+                    target = choice + 1
+
+                distance = shape.distance(coords[target], coords[choice])
+                while distance < radius:
+                    new_x = coords[target][0] + movement_x*falloff(radius, distance)
+                    new_y = coords[target][1] + movement_y*falloff(radius, distance)
+                    coords[target] = (new_x, new_y)
+                    if target == len(coords)-1:
+                        new_target = 0
+                    else:
+                        new_target = target + 1
+
+                    distance += shape.distance(coords[target], coords[new_target])
+                    target = new_target
+                
+                #negative
+                target = choice - 1
+
+                distance = shape.distance(coords[target], coords[choice])
+                while distance < radius:
+                    new_x = coords[target][0] + movement_x*falloff(radius, distance)
+                    new_y = coords[target][1] + movement_y*falloff(radius, distance)
+                    coords[target] = (new_x, new_y)
+                    new_target = target - 1
+
+                    distance += shape.distance(coords[target], coords[new_target])
+                    target = new_target
+
+                s = shape.Shape(coords, shp.interiors, shp.move_restrictions, shp.fixed_displacements, shp.forces)
+                s = shape.even_out_shape(s, 3)
+
+                success = s.is_valid and s.is_simple
+
+            return s
+
+
+
+        for _ in range(self.n_times):
+            shp = help(shp)
+
+        return shp
 
     
     
