@@ -11,6 +11,7 @@ import socket
 import pickle
 from algorithms import mutation_algorithms, read_in_algorithms, evaluation_algorithms, pairing_algorithms
 import os
+import random
 
 import threading
 
@@ -78,8 +79,18 @@ class GUI(tk.Tk):
         print("save as")
 
     def _test(self):
-        self.core.generate_first_generation()
-        self.core.evaluate_shapes(self.core.generations[0])
+        
+        active = [algo for algo in self.core.mutation_algorithms if algo.activated]
+        algo = random.choice(active)
+        new_shape = algo.change_shape(self.core.inital_shape)
+        self.pages['startpage'].draw_shape_comparison(new_shape, self.core.inital_shape, True)
+        time.sleep(1)
+
+        # for _ in range(30):
+        #     new_shape = algo.change_shape(new_shape)
+        #     self.pages['startpage'].draw_shape_comparison(new_shape, self.core.inital_shape, True)
+        #     time.sleep(1)
+        
 
     def test_exampleshape(self):
         for connection in self.get_mentat_connections():
@@ -565,6 +576,7 @@ if __name__=='__main__':
     gui = GUI()
     
     gui.core.inital_shape=shape.csv_to_shape('wuerfel.csv')
+    #gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()
     gui.pages['startpage'].draw_shape_foreground(gui.core.inital_shape)
 
     # gui.core.inital_shape = examples.get_realisticreate_example_polygonc_example()

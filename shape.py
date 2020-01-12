@@ -12,6 +12,34 @@ def str_to_bool(str_):
         return False
     else:
         return None
+def point_perpendicular_at_distance(point, neighbour1, neighbour2, distance):
+    """returns a point at a given distance perpendicular to a line given by two other points
+
+    A negative distance, as well as exchanging neighbour1 and neighbour2 will result in
+    the calculated point laying on the opposite side of the line
+    
+    Args:
+        neighbour1 (iterable object of length 2): first point defining the line
+        neighbour2 (iterable object of length 2): second point defining the line
+        distance (float): distance to the initial point
+    """
+
+    sx, sy = neighbour1
+    ex, ey = neighbour2
+    px, py = point
+
+    movement_x = ey - sy
+    movement_y = sx - ex
+
+    vec_len = math.sqrt(movement_x**2 + movement_y**2)
+
+    movement_x = (movement_x/vec_len)*distance
+    movement_y = (movement_y/vec_len)*distance
+
+    x = px + movement_x
+    y = py + movement_y
+    return (x,y)
+
 
 def move_point(point, start, end, movement, restriction):
         sx, sy = start

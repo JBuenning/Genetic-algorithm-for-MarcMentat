@@ -172,6 +172,7 @@ class AlgorithmTwo(MutationAlgorithm):
         self.max_recursiondepth=20
         self.n_times = 20
         self.editing_mode = 'smooth'
+        self.avoid_expand = True
 
     def set_default(self):# button-click
         self.default_settings()
@@ -188,6 +189,8 @@ class AlgorithmTwo(MutationAlgorithm):
         self.ent_n_times.delete(0, 'end')
         self.ent_n_times.insert(0, self.n_times)
         self.ent_editing_mode.current(0)
+        self.ent_avoid_expand.state(['!alternate'])
+        self.ent_avoid_expand.state(['selected'])
 
     def apply(self):
         try:
@@ -236,6 +239,7 @@ class AlgorithmTwo(MutationAlgorithm):
             self.ent_n_times.insert(0, self.n_times)
         
         self.editing_mode = self.ent_editing_mode.get()
+        self.avoid_expand = self.ent_avoid_expand.instate(['selected'])
 
     def get_settings_frame(self, master):
         frame = tk.Frame(master)
@@ -263,10 +267,12 @@ class AlgorithmTwo(MutationAlgorithm):
         tk.Label(frame, text='editing mode').grid(row=6, column=0, sticky='w')
         self.ent_editing_mode = tk.ttk.Combobox(frame, values=['smooth', 'linear', 'constant', 'sharp', 'root', 'sphere'], state='readonly')
         self.ent_editing_mode.grid(row=6, column=1)
+        self.ent_avoid_expand = ttk.Checkbutton(frame, text='avoid expanison', state='active')
+        self.ent_avoid_expand.grid(columnspan=2, sticky='w', row=7, column=0, pady=4)
         apply = ttk.Button(frame, text='apply', command=self.apply)
-        apply.grid(row=7, column=0, pady=4)
+        apply.grid(row=8, column=0, pady=4)
         default = ttk.Button(frame, text='reset', command=self.set_default)
-        default.grid(row=7, column=1, pady=4)
+        default.grid(row=8, column=1, pady=4)
         self.set_default()
         return frame
 
@@ -324,11 +330,10 @@ class AlgorithmTwo(MutationAlgorithm):
                 if choice == len(coords)-1:
                     n2 = 0
                 else:
-                    n2 += 1
-                new_point = shape.move_point(coords[choice], coords[n1], coords[n2], movement, shp.moverestrictions[choice])
+                    n2 = choice + 1
+                new_point = shape.point_perpendicular_at_distance(coords[choice], coords[n1], coords[n2], movement)
                 movement_x = new_point[0] - coords[choice][0]
                 movement_y = new_point[1] - coords[choice][1]
-                coords[choice] = new_point
 
                 #positive
                 if choice == len(coords)-1:
@@ -340,13 +345,16 @@ class AlgorithmTwo(MutationAlgorithm):
                 while distance < radius:
                     new_x = coords[target][0] + movement_x*falloff(radius, distance)
                     new_y = coords[target][1] + movement_y*falloff(radius, distance)
-                    coords[target] = (new_x, new_y)
                     if target == len(coords)-1:
                         new_target = 0
                     else:
                         new_target = target + 1
 
                     distance += shape.distance(coords[target], coords[new_target])
+                    if not shp.move_restrictions[target]:
+                        coords[target] = (new_x, new_y)
+
+                    
                     target = new_target
                 
                 #negative
@@ -356,16 +364,22 @@ class AlgorithmTwo(MutationAlgorithm):
                 while distance < radius:
                     new_x = coords[target][0] + movement_x*falloff(radius, distance)
                     new_y = coords[target][1] + movement_y*falloff(radius, distance)
-                    coords[target] = (new_x, new_y)
                     new_target = target - 1
 
                     distance += shape.distance(coords[target], coords[new_target])
+
+                    if not shp.move_restrictions[target]:
+                        coords[target] = (new_x, new_y)
+
                     target = new_target
 
+                coords[choice] = new_point
+
                 s = shape.Shape(coords, shp.interiors, shp.move_restrictions, shp.fixed_displacements, shp.forces)
-                s = shape.even_out_shape(s, 3)
+                s = shape.even_out_shape(s, 5)
 
                 success = s.is_valid and s.is_simple
+
 
             return s
 
